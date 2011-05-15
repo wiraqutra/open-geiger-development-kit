@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:background="@drawable/phone"
+    >
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    	android:orientation="horizontal"
+    	android:layout_width="fill_parent"
+    	android:layout_height="wrap_content"
+    	android:layout_marginTop="30px"
+    	android:layout_marginLeft="10px"
+    	android:layout_marginRight="10px"
+    	>
+    	<ImageView 
+    		android:id="@+id/icon_bluetooth" 
+        	android:layout_width="30px"
+        	android:layout_height="30px"
+        	android:src="@drawable/bluetooth"
+		/>
+		<ImageView 
+			android:id="@+id/icon_geiger" 
+        	android:layout_width="30px"
+        	android:layout_height="30px"
+        	android:src="@drawable/geiger"
+		/>
+		<TextView
+			android:id="@+id/device"
+			android:layout_width="fill_parent"
+			android:layout_height="wrap_content"
+			android:textColor="#000000"
+			android:layout_gravity="right"
+			android:gravity="right"
+		/>
+    </LinearLayout>
+    
+    <TextView
+		android:id="@+id/value"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:textSize="100px"
+		android:text="-"
+		android:gravity="center"
+		android:textColor="#000000"
+		android:layout_gravity="center"
+	>
+	</TextView>
+	 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    	android:orientation="horizontal"
+    	android:layout_width="fill_parent"
+    	android:layout_height="wrap_content"
+    	android:layout_gravity="center"
+    	android:gravity="center"
+    	android:layout_marginTop="100px"
+    	>
+	    <Button android:text="ON" 
+	        android:id="@+id/Button02" 
+	        android:layout_width="100px" 
+	        android:layout_height="100px"
+	        android:textSize="30px"
+	        >
+	    </Button>
+   </LinearLayout>
+ 
+    
+
+</LinearLayout>
