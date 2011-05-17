@@ -1,0 +1,23 @@
+arduino
+  ICL/ICHコネクタ
+    #0:TX BluetoothモジュールのRX(pin5)
+    #1:RX BluetoothモジュールのTX(pin4)
+      シリアル通信ポートが、ファーム書き込みとBluetoothモジュールとで共用しているため
+      arduinoのパターンカットとジャンパー線が必要。
+      CutAndWiring.jpg 参照。
+    #2:ガイガーカウンタ割り込み入力(秋月ガイガーのExoutを、4.7KΩ+4.7KΩで分圧したものを入力)
+    #11:動作確認用LED
+    #12:Bluetooth ペアリング用SW入力
+    #13:デバッグ用COMポート(FT232RLに接続)
+  POWERコネクタ
+    3:5V(秋月ガイガーの S-81350の+5V出力)
+    5:GND
+BluetoothMate
+  115200bps だと動作しないので、「SU,57」コマンドを送出し、57600bpsに設定する。
+  CTS_5V(pin2)とRTS_5V(pin6)をショート
+  1:GND
+  2:CTS
+  3:VCC
+  4:TX
+  5:RX
+  6:RTS
