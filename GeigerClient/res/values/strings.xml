@@ -2,4 +2,5 @@
 <resources>
     <string name="hello">Hello World, gyger!</string>
     <string name="app_name">Geiger</string>
+    <string name="app_hand_name">手動入力</string>
 </resources>
