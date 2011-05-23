@@ -32,7 +32,7 @@ public class HandClient extends Activity  {
 	
 
 	public void onCreate(Bundle savedInstanceState) {
-
+		/*
        	Location location = null; 
         final double IDo = location.getLatitude(); //IDo 緯度の値 double型
         final double KDo = location.getLongitude();//KDo 経度の値 double型        
@@ -83,7 +83,10 @@ public class HandClient extends Activity  {
         		
         	}
         });
+        
+        */
     } 
+    
     
     
 }

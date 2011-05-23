@@ -45,6 +45,11 @@ public class ConnectedThread extends Thread {
     private int now_count;
     
     /**
+     * Start command
+     */
+  private static final byte[] cmdStart = {'s','t','t',0xd};
+        
+    /**
      * Connected Thread
      * @param socket socket of connection
      */
@@ -72,6 +77,12 @@ public class ConnectedThread extends Thread {
     public void run() {
     	Log.i(TAG,"ConnectionThread#run()");
     	
+    	try {
+			mmOutStream.write( "stt¥n".getBytes() );
+		} catch (IOException e1) {
+			Log.i(TAG,"Error:"+e1);
+		}
+		CPMData mCPMData = new CPMData();
     	
         byte[] buffer = new byte[1024];  // buffer store for the stream
         int bytes; // bytes returned from read()
@@ -79,12 +90,25 @@ public class ConnectedThread extends Thread {
         // Keep listening to the InputStream until an exception occurs
         while (true) {
             try {
+            	
+            
+            	 
+            	
                 // Read from the InputStream
                 bytes = mmInStream.read(buffer);
                 
                 String readMsg = new String(buffer, 0, bytes);
+                Log.i(TAG,"readMsg:"+readMsg);
+                if(readMsg.trim() != null && !readMsg.trim().equals("")){
+                	int value = Integer.parseInt(readMsg.trim());
+                	
+                	mCPMData.insertValue(value);
+                	Log.i(TAG,"CPM="+mCPMData.getCPM());
+                	connectedThreadListener.onResult(mCPMData.getCPM());
+                }
                 
                 // regrex ( 30:1 )
+                /*
                 Pattern pattern = Pattern.compile("([0-9]*):([0-9]*)");
                 Matcher matcher = pattern.matcher(readMsg);
                 boolean blnMatch= matcher.find();
@@ -97,14 +121,19 @@ public class ConnectedThread extends Thread {
                 		connectedThreadListener.onResult(Integer.parseInt(matcher.group(1)));
                 	}
                 }
+                */
+                
                
                 // Sleep 10 sec
+                
+                /*
                 try {
 					Thread.sleep(10*1000);
 				} catch (InterruptedException e) {
 					
 					e.printStackTrace();
 				}
+				*/
                 
             } catch (IOException e) {
                 break;

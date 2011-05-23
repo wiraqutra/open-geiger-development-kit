@@ -46,30 +46,7 @@
 		android:layout_gravity="center"
 	>
 	</TextView>
-	 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    	android:orientation="horizontal"
-    	android:layout_width="fill_parent"
-    	android:layout_height="wrap_content"
-    	android:layout_gravity="center"
-    	android:gravity="center"
-    	android:layout_marginTop="100px"
-    	>
-	    <Button android:text="ON" 
-	        android:id="@+id/Button02" 
-	        android:layout_width="100px" 
-	        android:layout_height="100px"
-	        android:textSize="30px"
-	        >
-	    </Button>
-	     <Button android:text="Up" 
-	        android:id="@+id/Button03" 
-	        android:layout_width="100px" 
-	        android:layout_height="100px"
-	        android:textSize="30px"
-	        >
-	    </Button>
-   </LinearLayout>
- 
+	
     
 
 </LinearLayout>

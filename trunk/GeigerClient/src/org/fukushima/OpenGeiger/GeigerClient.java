@@ -8,9 +8,11 @@ import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
 import android.content.Context;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.provider.Settings;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -18,8 +20,9 @@ import android.view.Window;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
-public class GeigerClient extends Activity implements OnClickListener, ClientThreadListener, ConnectedThreadListener {
+public class GeigerClient extends Activity implements OnClickListener, ClientThreadListener, ConnectedThreadListener, WebAPIListener {
 	
 	/**
 	 * Tag
@@ -83,6 +86,9 @@ public class GeigerClient extends Activity implements OnClickListener, ClientThr
 	TextView mTextView;
 	TextView mTextViewDevice;
 	String value = "";
+	Uri mImageUri;
+	
+	String mCPM = "";
 	
     public void onCreate(Bundle savedInstanceState) {
     	
@@ -96,6 +102,10 @@ public class GeigerClient extends Activity implements OnClickListener, ClientThr
         // Satrt Server Button
         button02 = (Button)findViewById(R.id.Button02);
         button02.setOnClickListener(this);
+        
+     // Satrt Server Button
+        button03 = (Button)findViewById(R.id.Button03);
+        button03.setOnClickListener(this);
        
         // TextView of Value
         mTextView = (TextView)findViewById(R.id.value);
@@ -131,6 +141,22 @@ public class GeigerClient extends Activity implements OnClickListener, ClientThr
     		mAdapter.cancelDiscovery();
     		
     		clientThread.start();
+		}
+		// Upload Button
+		else if(view.equals(button03)){
+			WebAPI webAPI = new WebAPI();
+    		webAPI.setEventListener(this);
+    		
+    		if(mCPM != null && !mCPM.equals("")){
+	    		String[] mKey = new String[] { "datetime","label","valuetype","radiovalue","lat","lon"};
+	    		String[] mValue = new String[] { getDataformat(),"Hack4Geiger","0",mCPM,"37.524522","139.938825"};
+	    		webAPI.sendData(mKey, mValue);
+	    		Toast.makeText(this, "Upload data", Toast.LENGTH_LONG).show();
+    		}
+    		else{
+    			Toast.makeText(this, "Can't upload", Toast.LENGTH_LONG).show();
+    		}
+         
 		}
 	}
 	
@@ -168,10 +194,12 @@ public class GeigerClient extends Activity implements OnClickListener, ClientThr
 	public void onResult(int value) {
 		Log.i(TAG,"Result:"+value);
 		now_value = value;
+		mCPM = ""+value;
+		
 		Message msg = new Message();
 		msg.arg1 = value;
 		msg.what = CALC;
-		mHandler.sendMessageDelayed(msg, 60*1000);
+		mHandler.sendMessage(msg);
 		
 	}
 	
@@ -194,22 +222,30 @@ public class GeigerClient extends Activity implements OnClickListener, ClientThr
 					mTextView.setText("Calc");
 					break;
 				case CALC:
-					int old_value = msg.arg1;
-					if(now_value >= old_value){
-						Message mMsg = new Message();
-						mMsg.what = ICON_VISIBLE_GG;
-						mHandler.sendMessage(mMsg);
-						float value = (now_value - old_value)*85/1000;
-						mTextView.setText(""+value);
-					}
-					else{
-						Message mMsg = new Message();
-						mMsg.what = ICON_INVISIBLE_GG;
-						mHandler.sendMessage(mMsg);
-					}
+					mTextView.setText(mCPM);
+					Message mMsg = new Message();
+					mMsg.what = ICON_VISIBLE_GG;
+					mHandler.sendMessage(mMsg);
+					
 					break;
 			}
 		}
 	};
+
+	@Override
+	public void onLoad(int type, String json) {
+		// TODO Auto-generated method stub
+		Log.i(TAG,"SEND");
+		
+	}
 	
+	/**
+	 * Create date formati
+	 */
+	public String getDataformat(){
+		final String DEFAULT_DATE_FORMAT = "yyyy-MM-dd hh:mm:ss";
+        String date = Settings.System.getString(this.getContentResolver(), DEFAULT_DATE_FORMAT);
+        
+		return date;	
+	}
 }
