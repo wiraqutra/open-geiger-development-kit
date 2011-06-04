@@ -90,9 +90,7 @@ public class ConnectedThread extends Thread {
         // Keep listening to the InputStream until an exception occurs
         while (true) {
             try {
-            	
-            
-            	 
+   
             	
                 // Read from the InputStream
                 bytes = mmInStream.read(buffer);

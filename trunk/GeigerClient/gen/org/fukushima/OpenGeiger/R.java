@@ -17,12 +17,18 @@ public final class R {
         public static final int phone=0x7f020003;
     }
     public static final class id {
-        public static final int Button02=0x7f050004;
-        public static final int Button03=0x7f050005;
-        public static final int device=0x7f050002;
-        public static final int icon_bluetooth=0x7f050000;
-        public static final int icon_geiger=0x7f050001;
-        public static final int value=0x7f050003;
+        public static final int Button02=0x7f05000a;
+        public static final int Button03=0x7f05000b;
+        public static final int buttonGPS=0x7f050003;
+        public static final int buttonUp=0x7f050006;
+        public static final int device=0x7f050000;
+        public static final int editLat=0x7f050001;
+        public static final int editLon=0x7f050002;
+        public static final int editText=0x7f050005;
+        public static final int icon_bluetooth=0x7f050007;
+        public static final int icon_geiger=0x7f050008;
+        public static final int textView1=0x7f050004;
+        public static final int value=0x7f050009;
     }
     public static final class layout {
         public static final int hand_main=0x7f030000;

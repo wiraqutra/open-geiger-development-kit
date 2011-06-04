@@ -1,8 +1,20 @@
-package org.fukushima.OpenGeiger;
+package org.fukushima.OpenGeiger.AutoClient;
 
 import java.util.Set;
 import java.util.UUID;
+
+import org.fukushima.OpenGeiger.ClientThread;
+import org.fukushima.OpenGeiger.ClientThreadListener;
+import org.fukushima.OpenGeiger.ConnectedThread;
+import org.fukushima.OpenGeiger.ConnectedThreadListener;
+import org.fukushima.OpenGeiger.LocationAPI;
+import org.fukushima.OpenGeiger.LocationAPIListener;
 import org.fukushima.OpenGeiger.R;
+import org.fukushima.OpenGeiger.WebAPI;
+import org.fukushima.OpenGeiger.WebAPIListener;
+import org.fukushima.OpenGeiger.R.id;
+import org.fukushima.OpenGeiger.R.layout;
+
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
@@ -22,7 +34,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class GeigerClient extends Activity implements OnClickListener, ClientThreadListener, ConnectedThreadListener, WebAPIListener {
+public class GeigerClient extends Activity implements OnClickListener, ClientThreadListener, ConnectedThreadListener, WebAPIListener, LocationAPIListener {
 	
 	/**
 	 * Tag
@@ -57,12 +69,27 @@ public class GeigerClient extends Activity implements OnClickListener, ClientThr
 	/** 
 	 * Bluetooth Client Thread
 	 */
-	ClientThread clientThread;
+	private ClientThread clientThread;
 	
 	/**
 	 * Connected Thread
 	 */
-	ConnectedThread connection;
+	private ConnectedThread connection;
+	
+	/**
+	 * LocationAPI
+	 */
+	private LocationAPI locationAPI;
+	
+	/**
+	 * Lon
+	 */
+	private double lon;
+	
+	/**
+	 * Lat
+	 */
+	private double lat;
 	
 	/**
 	 * ImageView
@@ -128,7 +155,10 @@ public class GeigerClient extends Activity implements OnClickListener, ClientThr
 			if(device.getName().equals(DEVICE_NAME)){
 				mDevice = device;
 			}
-		} 
+		}
+		
+		locationAPI = new LocationAPI(this.getApplication());
+		locationAPI.setEventListener(this);
         
     }
     
@@ -141,6 +171,7 @@ public class GeigerClient extends Activity implements OnClickListener, ClientThr
     		mAdapter.cancelDiscovery();
     		
     		clientThread.start();
+    		locationAPI.getGps();
 		}
 		// Upload Button
 		else if(view.equals(button03)){
@@ -149,7 +180,7 @@ public class GeigerClient extends Activity implements OnClickListener, ClientThr
     		
     		if(mCPM != null && !mCPM.equals("")){
 	    		String[] mKey = new String[] { "datetime","label","valuetype","radiovalue","lat","lon"};
-	    		String[] mValue = new String[] { getDataformat(),"Hack4Geiger","0",mCPM,"37.524522","139.938825"};
+	    		String[] mValue = new String[] { getDataformat(),"Hack4Geiger","0",mCPM,""+lat,""+lon};
 	    		webAPI.sendData(mKey, mValue);
 	    		Toast.makeText(this, "Upload data", Toast.LENGTH_LONG).show();
     		}
@@ -247,5 +278,12 @@ public class GeigerClient extends Activity implements OnClickListener, ClientThr
         String date = Settings.System.getString(this.getContentResolver(), DEFAULT_DATE_FORMAT);
         
 		return date;	
+	}
+
+	@Override
+	public void onGpsLoad(double lat, double lon) {
+		// TODO Auto-generated method stub
+		this.lat = lat;
+		this.lon = lon;
 	}
 }
