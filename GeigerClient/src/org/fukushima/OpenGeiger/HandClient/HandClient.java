@@ -1,93 +1,157 @@
 package org.fukushima.OpenGeiger.HandClient;
 
-//import java.util.Set;
-//import java.util.UUID;
-//import org.fukushima.OpenGeiger.R;
+import org.fukushima.OpenGeiger.LocationAPI;
+import org.fukushima.OpenGeiger.LocationAPIListener;
 import org.fukushima.OpenGeiger.R;
-
+import org.fukushima.OpenGeiger.WebAPI;
+import org.fukushima.OpenGeiger.WebAPIListener;
 import android.app.Activity;
-//import android.app.AlertDialog;
-//import android.bluetooth.BluetoothAdapter;
-//import android.bluetooth.BluetoothDevice;
-//import android.bluetooth.BluetoothSocket;
-//import android.content.Context;
-//import android.content.*;
-import android.location.*;
+import android.app.Application;
+import android.content.Context;
+import android.location.Location;
+import android.location.LocationListener;
 import android.os.Bundle;
-//import android.os.Handler;
-//import android.os.Message;
-import android.util.Log;
+import android.os.Looper;
+import android.provider.Settings;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.Window;
 import android.widget.*;
-import android.text.*;
 
-public class HandClient extends Activity  {
+public class HandClient extends Activity implements WebAPIListener, LocationAPIListener {
 	
 	/**
 	 * Tag
 	 */
-//	private static final String TAG = "HAND_CLIENT";
+	private static final String TAG = "HAND_CLIENT";
 	
-
+	/**
+	 * Spinner for Device
+	 */
+	private Spinner spinnerDevice;
+	
+	/**
+	 * TextBot for Input
+	 */
+	private EditText editText;
+	
+	/**
+	 * TextBot for Input
+	 */
+	private EditText editLat;
+	
+	/**
+	 * TextBot for Input
+	 */
+	private EditText editLon;
+	
+	/**
+	 * Context
+	 */
+	private Context mContext;
+	
+	/**
+	 * Application
+	 */
+	private Application mApplication;
+	
 	public void onCreate(Bundle savedInstanceState) {
-		/*
-       	Location location = null; 
-        final double IDo = location.getLatitude(); //IDo 緯度の値 double型
-        final double KDo = location.getLongitude();//KDo 経度の値 double型        
-       final String ido = String.valueOf(IDo);
-       final String kdo = String.valueOf(KDo);
- 
-    	
-    	super.onCreate(savedInstanceState);
+		super.onCreate(savedInstanceState);
         
     	requestWindowFeature(Window.FEATURE_NO_TITLE);
+    	setContentView(R.layout.hand_main);
     	
-    	setContentView(R.layout.main);
+    	mContext = this.getApplicationContext();
+    	mApplication = this.getApplication();
     	
-    	Spinner KiS   = (Spinner)  this.findViewById(R.layout.main);
-                KiS   = (Spinner)  this.findViewById(R.id.kisyu);
-        //ArrayAdapter<String> ADP = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item);
-        //ガイガーカウンター機種  
-        //ADP.add("放射能ハカール");  
-        //ADP.add("測定器β");  
-        //ADP.add("はかるくん２００");  
-        //スピナーにADPを設定  
-        Spinner spinner = (Spinner)this.findViewById(R.id.kisyu);  
-        //spinner.setAdapter(ADP);  
-        final String Kisyu = KiS.getSelectedItem().toString();
+    	spinnerDevice   = (Spinner)  this.findViewById(R.id.device);
+        ArrayAdapter<String> ADP = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item);
         
-        //ImageView IM;
+        // list of geiger counter
+        ADP.add("SOEKS 01");  
+        ADP.add("RADEX RD1008");  
+        ADP.add("RADEX RD1706");
+        ADP.add("RADEX RD1503+");
+        ADP.add("RADEX RD1503");  
         
-       	EditText editT;
-        editT = (EditText) this.findViewById(R.layout.main);
-        editT = (EditText) this.findViewById(R.id.ati);
-        editT.setHeight(50);
-        
-        SpannableStringBuilder SEN = (SpannableStringBuilder) editT.getText();
-        final String ATI = SEN.toString();
-        Double.parseDouble(ATI);             //ATI 線量の値 double型
-        
-    	Button   BTN;
-        BTN   = (Button) this.findViewById(R.layout.main);
-        BTN   = (Button) this.findViewById(R.id.sosin);
-        BTN.setOnClickListener(new OnClickListener(){
+        // add apinner 
+        spinnerDevice.setAdapter(ADP);  
+     
+        // input textbox
+       	editText = (EditText) this.findViewById(R.id.editText);
+       	
+        // input Lat
+       	editLat = (EditText) this.findViewById(R.id.editLat);
+       	
+        // input Lon
+       	editLon = (EditText) this.findViewById(R.id.editLon);
+       	
+       	// Get GPS
+       	Button gpsButton   = (Button) this.findViewById(R.id.buttonGPS);
+       	final LocationAPI locationAPI = new LocationAPI(mApplication);
+		locationAPI.setEventListener(this);
+		
+       	gpsButton.setOnClickListener(new OnClickListener(){
         	public void onClick(View view){
-        		//送信ボタンを押したときの処理
-        	        	
-        		Log.i("機種",Kisyu);
-        		Log.i("線量", ATI);
-        		Log.i("緯度", ido);
-        		Log.i("経度", kdo);
+        		locationAPI.getGps();
+        	}
+       	});
+       	
+       	
+       	// upload button
+       	Button uploadButton   = (Button) this.findViewById(R.id.buttonUp);
+       	final WebAPI webAPI = new WebAPI();
+		webAPI.setEventListener(this);
+		
+		uploadButton.setOnClickListener(new OnClickListener(){
+        	public void onClick(View view){
+    		 	String device = spinnerDevice.getSelectedItem().toString();
+    		 	String value = editText.getText().toString();
+        		String lon = editLon.getText().toString();
+        		String lat = editLat.getText().toString();
+        		if(lon == null || lat == null){
+        			Toast.makeText(mContext, "At first, you must get GPS", Toast.LENGTH_LONG).show();
+        		}
+        		else if(value != null && !value.equals("")){ 	
+        			String[] mKey = new String[] { "datetime","label","valuetype","radiovalue","lat","lon"};
+    	    		String[] mValue = new String[] { getDataformat(),device,"0",value,lon,lat};
+    	    		webAPI.sendData(mKey, mValue);
+    	    		Toast.makeText(mContext, "Uploading data", Toast.LENGTH_LONG).show();
+        		}
+        		else{
+        			Toast.makeText(mContext, "Input value", Toast.LENGTH_LONG).show();
+        		}
         		
         	}
         });
+       
+    }
+
+	@Override
+	public void onLoad(int type, String json) {
+		Looper.prepare();
+		Toast.makeText(mContext, "Finish upload", Toast.LENGTH_LONG).show();
+		Looper.loop();
+		editText.setText("");
+	} 
+	
+	/**
+	 * Create date formati
+	 */
+	public String getDataformat(){
+		final String DEFAULT_DATE_FORMAT = "yyyy-MM-dd hh:mm:ss";
+        String date = Settings.System.getString(this.getContentResolver(), DEFAULT_DATE_FORMAT);
         
-        */
-    } 
-    
-    
-    
+		return date;	
+	}
+
+	@Override
+	public void onGpsLoad(double lat, double lon) {
+		editLat.setText(""+lat);
+		editLon.setText(""+lon);		
+	}
+
+	
+	
 }
 	
