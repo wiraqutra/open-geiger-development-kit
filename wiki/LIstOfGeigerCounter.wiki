@@ -1,3 +1,7 @@
 = List =
 * SOEKS SK-01
 http://soeks.ru/dozimetr.html
+* RADEX RD1008
+* RADEX RD1706
+* RADEX RD1503+
+* RADEX RD1503
