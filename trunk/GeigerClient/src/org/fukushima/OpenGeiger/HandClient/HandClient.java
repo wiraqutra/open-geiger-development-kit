@@ -5,11 +5,16 @@ import org.fukushima.OpenGeiger.LocationAPIListener;
 import org.fukushima.OpenGeiger.R;
 import org.fukushima.OpenGeiger.WebAPI;
 import org.fukushima.OpenGeiger.WebAPIListener;
+
+import com.google.android.maps.GeoPoint;
+import com.google.android.maps.MapActivity;
+import com.google.android.maps.MapController;
+import com.google.android.maps.MapView;
+
 import android.app.Activity;
 import android.app.Application;
 import android.content.Context;
-import android.location.Location;
-import android.location.LocationListener;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Looper;
 import android.provider.Settings;
@@ -18,7 +23,7 @@ import android.view.View.OnClickListener;
 import android.view.Window;
 import android.widget.*;
 
-public class HandClient extends Activity implements WebAPIListener, LocationAPIListener {
+public class HandClient extends MapActivity implements WebAPIListener, LocationAPIListener {
 	
 	/**
 	 * Tag
@@ -55,14 +60,62 @@ public class HandClient extends Activity implements WebAPIListener, LocationAPIL
 	 */
 	private Application mApplication;
 	
+	/**
+	 * MapView
+	 */
+	private MapView mMap;
+	
+	/**
+	 * MapController
+	 */
+	private MapController mMapController;
+	
+	/**
+	 * Pin
+	 */
+	private Drawable mPin;
+	
+	/**
+	 * Pin Overlay
+	 */
+	private PinOverlay mOverlay;
+	
+	/**
+	 * Lat
+	 */
+	private double lat = 0;
+	
+	/**
+	 * Lon
+	 */
+	private double lon = 0;
+	
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-        
     	requestWindowFeature(Window.FEATURE_NO_TITLE);
+    	
     	setContentView(R.layout.hand_main);
     	
     	mContext = this.getApplicationContext();
     	mApplication = this.getApplication();
+    	
+    	mMap = (MapView)findViewById(R.id.mapView); 
+    	mMapController = mMap.getController();
+    	mMapController.setZoom(16);
+    	
+    	//アイコンリソース取得
+        mPin = getResources().getDrawable( R.drawable.pin);
+  
+        //SampleItemizedOverrayのインスタンスにアイコン登録
+        mOverlay = new PinOverlay(mPin);
+        mMap.getOverlays().add(mOverlay);
+        
+    	LocationAPI locationAPI = new LocationAPI(mApplication);
+		locationAPI.setEventListener(this);
+    	locationAPI.getGps();
+    	 
+    	 
+    	
     	
     	spinnerDevice   = (Spinner)  this.findViewById(R.id.device);
         ArrayAdapter<String> ADP = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item);
@@ -76,10 +129,11 @@ public class HandClient extends Activity implements WebAPIListener, LocationAPIL
         
         // add apinner 
         spinnerDevice.setAdapter(ADP);  
-     
+        
         // input textbox
        	editText = (EditText) this.findViewById(R.id.editText);
        	
+       	/*
         // input Lat
        	editLat = (EditText) this.findViewById(R.id.editLat);
        	
@@ -96,7 +150,7 @@ public class HandClient extends Activity implements WebAPIListener, LocationAPIL
         		locationAPI.getGps();
         	}
        	});
-       	
+       	*/
        	
        	// upload button
        	Button uploadButton   = (Button) this.findViewById(R.id.buttonUp);
@@ -107,14 +161,13 @@ public class HandClient extends Activity implements WebAPIListener, LocationAPIL
         	public void onClick(View view){
     		 	String device = spinnerDevice.getSelectedItem().toString();
     		 	String value = editText.getText().toString();
-        		String lon = editLon.getText().toString();
-        		String lat = editLat.getText().toString();
-        		if(lon == null || lat == null){
+        		
+        		if(lon == 0 && lat == 0){
         			Toast.makeText(mContext, "At first, you must get GPS", Toast.LENGTH_LONG).show();
         		}
         		else if(value != null && !value.equals("")){ 	
         			String[] mKey = new String[] { "datetime","label","valuetype","radiovalue","lat","lon"};
-    	    		String[] mValue = new String[] { getDataformat(),device,"0",value,lon,lat};
+    	    		String[] mValue = new String[] { getDataformat(),device,"0",value,""+lon,""+lat};
     	    		webAPI.sendData(mKey, mValue);
     	    		Toast.makeText(mContext, "Uploading data", Toast.LENGTH_LONG).show();
         		}
@@ -124,6 +177,7 @@ public class HandClient extends Activity implements WebAPIListener, LocationAPIL
         		
         	}
         });
+        
        
     }
 
@@ -146,9 +200,22 @@ public class HandClient extends Activity implements WebAPIListener, LocationAPIL
 	}
 
 	@Override
-	public void onGpsLoad(double lat, double lon) {
-		editLat.setText(""+lat);
-		editLon.setText(""+lon);		
+	public void onGpsLoad(double lat, double lon) {	
+		GeoPoint point = new GeoPoint((int)(lat * 1e6),  (int)(lon * 1e6));  
+        mMapController.animateTo(point);  
+        
+        mOverlay.clearPoint();
+        mOverlay.addPoint(point);
+        
+        
+        this.lat = lat;
+        this.lon = lon;
+	}
+
+	@Override
+	protected boolean isRouteDisplayed() {
+		// TODO Auto-generated method stub
+		return false;
 	}
 
 	

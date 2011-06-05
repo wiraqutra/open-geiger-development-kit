@@ -1,94 +1,80 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
-    android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
-    android:layout_gravity="center_horizontal"
-    android:gravity="center_horizontal"
-    android:background="#000000"
-    >
-    <Spinner 
-    	android:layout_height="wrap_content" 
-    	android:id="@+id/device"
-    	android:layout_width="match_parent">
-    </Spinner>
-    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-		    android:orientation="horizontal"
-		    android:layout_width="fill_parent"
-		    android:layout_height="wrap_content"
-		    android:background="#000000"
-	    >
-	    	<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-			    android:orientation="vertical"
-			    android:layout_width="200dip"
-			    android:layout_height="fill_parent"
-			    android:background="#000000"
-		    >
-				<EditText 
-			    	android:layout_height="wrap_content" 
-			    	android:text="" 
-			    	android:layout_width="match_parent" 
-			    	android:id="@+id/editLat"
-			    	android:maxLines="1"
-			    	android:singleLine="true"
-			    	android:numeric="decimal"
-			    	android:gravity="center"
-			    	>
-			    </EditText>
-			    <EditText 
-			    	android:layout_height="wrap_content" 
-			    	android:text="" 
-			    	android:layout_width="match_parent" 
-			    	android:id="@+id/editLon"
-			    	android:maxLines="1"
-			    	android:singleLine="true"
-			    	android:numeric="decimal"
-			    	android:gravity="center"
-			    	>
-			    </EditText>
-			</LinearLayout>
-		    <Button android:text="Get GPS" 
-		        android:id="@+id/buttonGPS" 
-		        android:layout_width="100px" 
-		        android:layout_height="100px"
-		        android:textSize="30px"
-		        >
-		    </Button>
-		</LinearLayout>
-    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-		    android:orientation="horizontal"
-		    android:layout_width="fill_parent"
-		    android:layout_height="wrap_content"
-		    android:background="#000000"
-	    >
-        <TextView 
-        	android:text="Value:" 
-        	android:id="@+id/textView1" 
-        	android:layout_width="wrap_content" 
-        	android:layout_height="wrap_content"
-        	android:textSize="40dip"
-        	>
-        </TextView>
-	    <EditText 
-	    	android:layout_height="wrap_content" 
-	    	android:text="" 
-	    	android:textSize="40dip"
-	    	android:layout_width="match_parent" 
-	    	android:id="@+id/editText"
-	    	android:maxLines="1"
-	    	android:singleLine="true"
-	    	android:numeric="decimal"
-	    	android:gravity="center"
-	    	>
-	    </EditText>
-	 </LinearLayout>
-	    
-    <Button android:text="Upload" 
-        android:id="@+id/buttonUp" 
-        android:layout_width="match_parent" 
-        android:layout_height="wrap_content" 
-        android:textSize="30px"
-        >
-    </Button>
+	android:orientation="vertical" 
+	android:layout_width="fill_parent"
+	android:layout_height="fill_parent">
+	
+	<LinearLayout 
+		xmlns:android="http://schemas.android.com/apk/res/android"
+		android:orientation="horizontal" 
+		android:layout_width="fill_parent"
+		android:layout_height="wrap_content" 
+		android:background="#000000">
+		
+		<TextView android:text="Device:" 
+			android:id="@+id/textView1"
+			android:layout_width="100dip" 
+			android:layout_height="wrap_content"
+			android:textSize="30dip"
+			>
+		</TextView>
+		<Spinner 
+			android:id="@+id/device"
+			android:layout_height="wrap_content" 
+			android:layout_width="match_parent">
+		</Spinner>
+	</LinearLayout>
+	
+	
+	<LinearLayout 
+		xmlns:android="http://schemas.android.com/apk/res/android"
+		android:orientation="horizontal" 
+		android:layout_width="fill_parent"
+		android:layout_height="wrap_content" 
+		android:background="#000000">
+		
+		<TextView android:text="Value:" 
+			android:id="@+id/textView2"
+			android:layout_width="100dip" 
+			android:layout_height="wrap_content"
+			android:textSize="30dip">
+		</TextView>
+		<EditText android:layout_height="wrap_content" 
+			android:text=""
+			android:textSize="30dip" 
+			android:layout_width="match_parent"
+			android:id="@+id/editText" 
+			android:maxLines="1" 
+			android:singleLine="true"
+			android:numeric="decimal" 
+			android:gravity="center">
+		</EditText>
+	</LinearLayout>
+	
+	<LinearLayout 
+		xmlns:android="http://schemas.android.com/apk/res/android"
+		android:orientation="horizontal" 
+		android:layout_width="fill_parent"
+		android:layout_height="wrap_content" 
+		android:background="#000000"
+		android:paddingBottom="10dip"
+		>
+
+		<com.google.android.maps.MapView
+			android:id="@+id/mapView" 
+			android:layout_width="fill_parent"
+			android:layout_height="200dip" 
+			android:enabled="true"
+			android:clickable="true" 
+			android:apiKey="0-3NMmILBV71JRGkmp6n4b9GcNQ1OnOxBquJ8Bg" />
+	</LinearLayout>
+	
+	<Button android:text="Upload" 
+		
+		android:id="@+id/buttonUp"
+		android:layout_width="match_parent" 
+		android:layout_height="wrap_content"
+		android:textSize="30px">
+	</Button>
 
 </LinearLayout>

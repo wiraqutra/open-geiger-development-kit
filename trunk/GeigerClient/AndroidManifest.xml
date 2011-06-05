@@ -3,7 +3,7 @@
       package="org.fukushima.OpenGeiger"
       android:versionCode="1"
       android:versionName="1.0">
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"></uses-permission>
+    
 
 
     <application android:icon="@drawable/icon" android:label="@string/app_name">
@@ -28,11 +28,13 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        
+       	 <uses-library android:name="com.google.android.maps"></uses-library> 
     </application>
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.BLUETOOTH"/>
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN"/>
-     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+   
     
 </manifest>
