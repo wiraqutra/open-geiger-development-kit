@@ -39,7 +39,7 @@ public class LocationAPI implements LocationListener {
 		// LocationManagerでGPSの値を取得するための設定  
 		lm = (LocationManager) mApplication.getSystemService(Context.LOCATION_SERVICE);      
 		// 値が変化した際に呼び出されるリスナーの追加  
-		lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this); 
+		lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 30*1000, 1, this); 
 	}
 	
 	@Override
