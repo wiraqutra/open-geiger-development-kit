@@ -14,10 +14,13 @@ import com.google.android.maps.MapView;
 import android.app.Activity;
 import android.app.Application;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Looper;
 import android.provider.Settings;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.Window;
@@ -139,24 +142,8 @@ public class HandClient extends MapActivity implements WebAPIListener, LocationA
         // input textbox
        	editText = (EditText) this.findViewById(R.id.editText);
        	
-       	/*
-        // input Lat
-       	editLat = (EditText) this.findViewById(R.id.editLat);
        	
-        // input Lon
-       	editLon = (EditText) this.findViewById(R.id.editLon);
-       	
-       	// Get GPS
-       	Button gpsButton   = (Button) this.findViewById(R.id.buttonGPS);
-       	final LocationAPI locationAPI = new LocationAPI(mApplication);
-		locationAPI.setEventListener(this);
-		
-       	gpsButton.setOnClickListener(new OnClickListener(){
-        	public void onClick(View view){
-        		locationAPI.getGps();
-        	}
-       	});
-       	*/
+     
 
        	Button reloadButton   = (Button) this.findViewById(R.id.buttonReload);
        	
@@ -235,7 +222,24 @@ public class HandClient extends MapActivity implements WebAPIListener, LocationA
 		return false;
 	}
 
+	@Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        menu.add(Menu.NONE, 1, Menu.NONE, "Auto Client");
+        return super.onCreateOptionsMenu(menu);
+    }
 	
+	@Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        boolean ret = true;
+        switch (item.getItemId()) {
+        case 1:
+        	Intent selectIntent = new Intent();
+        	selectIntent.setClassName("org.fukushima.OpenGeiger","org.fukushima.OpenGeiger.AutoClient.GeigerClient");
+        	startActivity(selectIntent);
+            break;
+        }
+        return ret;
+    }
 	
 }
 	
