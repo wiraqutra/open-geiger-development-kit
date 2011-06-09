@@ -69,6 +69,25 @@
 			android:apiKey="0-3NMmILBV71JRGkmp6n4b9GcNQ1OnOxBquJ8Bg" />
 	</LinearLayout>
 	
+	<LinearLayout 
+		xmlns:android="http://schemas.android.com/apk/res/android"
+		android:orientation="horizontal" 
+		android:layout_width="fill_parent"
+		android:layout_height="wrap_content" 
+		android:background="#000000"
+		android:gravity="right"
+		android:layout_gravity="right"
+		>
+		
+		<Button android:text="Reload" 
+		
+			android:id="@+id/buttonReload"
+			android:layout_width="100dip" 
+			android:layout_height="wrap_content"
+			android:textSize="20px">
+		</Button>
+	</LinearLayout>
+	
 	<Button android:text="Upload" 
 		
 		android:id="@+id/buttonUp"

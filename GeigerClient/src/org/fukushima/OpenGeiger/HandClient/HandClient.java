@@ -90,6 +90,12 @@ public class HandClient extends MapActivity implements WebAPIListener, LocationA
 	 */
 	private double lon = 0;
 	
+	/**
+	 * LocationAPI
+	 */
+	private LocationAPI locationAPI;
+	
+	
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
     	requestWindowFeature(Window.FEATURE_NO_TITLE);
@@ -110,7 +116,7 @@ public class HandClient extends MapActivity implements WebAPIListener, LocationA
         mOverlay = new PinOverlay(mPin);
         mMap.getOverlays().add(mOverlay);
         
-    	LocationAPI locationAPI = new LocationAPI(mApplication);
+    	locationAPI = new LocationAPI(mApplication);
 		locationAPI.setEventListener(this);
     	locationAPI.getGps();
     	 
@@ -151,7 +157,16 @@ public class HandClient extends MapActivity implements WebAPIListener, LocationA
         	}
        	});
        	*/
+
+       	Button reloadButton   = (Button) this.findViewById(R.id.buttonReload);
        	
+		
+		reloadButton.setOnClickListener(new OnClickListener(){
+			public void onClick(View view){
+				locationAPI.reloadGps();
+			}
+		});
+		
        	// upload button
        	Button uploadButton   = (Button) this.findViewById(R.id.buttonUp);
        	final WebAPI webAPI = new WebAPI();
@@ -210,6 +225,8 @@ public class HandClient extends MapActivity implements WebAPIListener, LocationA
         
         this.lat = lat;
         this.lon = lon;
+        
+        locationAPI.removeGps();
 	}
 
 	@Override

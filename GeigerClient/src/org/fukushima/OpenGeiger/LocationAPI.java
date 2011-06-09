@@ -42,6 +42,18 @@ public class LocationAPI implements LocationListener {
 		lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 30*1000, 1, this); 
 	}
 	
+	public void reloadGps(){
+		lm.removeUpdates(this);
+		// LocationManagerでGPSの値を取得するための設定  
+		lm = (LocationManager) mApplication.getSystemService(Context.LOCATION_SERVICE);      
+		// 値が変化した際に呼び出されるリスナーの追加  
+		lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 30*1000, 1, this); 
+	}
+	
+	public void removeGps(){
+		lm.removeUpdates(this);
+	}
+	
 	@Override
 	public void onLocationChanged(Location location) {
 		// TODO Auto-generated method stub
