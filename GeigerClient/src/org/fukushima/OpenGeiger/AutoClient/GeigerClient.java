@@ -406,7 +406,7 @@ public class GeigerClient extends MapActivity implements OnClickListener, Client
 	private double getLon(){
 		// MYDATAという名前のSharedPreference
 		SharedPreferences settings = mContext.getSharedPreferences("MYDATA", mContext.MODE_PRIVATE);
-		String lon = settings.getString("lat","139.93017");
+		String lon = settings.getString("lon","139.93017");
 		return Double.parseDouble(lon);
 	}	
 }
