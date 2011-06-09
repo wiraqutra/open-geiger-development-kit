@@ -15,6 +15,7 @@ import android.app.Activity;
 import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Looper;
@@ -119,6 +120,11 @@ public class HandClient extends MapActivity implements WebAPIListener, LocationA
         mOverlay = new PinOverlay(mPin);
         mMap.getOverlays().add(mOverlay);
         
+        GeoPoint point = new GeoPoint((int)(getLat() * 1e6),  (int)(getLon() * 1e6));  
+        mMapController.animateTo(point);  
+        mOverlay.clearPoint();
+        mOverlay.addPoint(point);
+        
     	locationAPI = new LocationAPI(mApplication);
 		locationAPI.setEventListener(this);
     	locationAPI.getGps();
@@ -213,6 +219,8 @@ public class HandClient extends MapActivity implements WebAPIListener, LocationA
         this.lat = lat;
         this.lon = lon;
         
+        saveGps(lat,lon);
+        
         locationAPI.removeGps();
 	}
 
@@ -240,6 +248,31 @@ public class HandClient extends MapActivity implements WebAPIListener, LocationA
         }
         return ret;
     }
+	
+	private void saveGps(double lat, double lon){
+		// MYDATAという名前のSharedPreference
+		SharedPreferences settings = mContext.getSharedPreferences("MYDATA", mContext.MODE_PRIVATE);
+
+		SharedPreferences.Editor editor = settings.edit();
+		editor.putString("lat", ""+lat);
+		editor.putString("lon", ""+lon);
+
+		editor.commit();
+	}
+	
+	private double getLat(){
+		// MYDATAという名前のSharedPreference
+		SharedPreferences settings = mContext.getSharedPreferences("MYDATA", mContext.MODE_PRIVATE);
+		String lat = settings.getString("lat","37.487489");
+		return Double.parseDouble(lat);
+	}
+	
+	private double getLon(){
+		// MYDATAという名前のSharedPreference
+		SharedPreferences settings = mContext.getSharedPreferences("MYDATA", mContext.MODE_PRIVATE);
+		String lon = settings.getString("lat","139.93017");
+		return Double.parseDouble(lon);
+	}	
 	
 }
 	
