@@ -20,7 +20,7 @@
         
          <activity android:name="org.fukushima.OpenGeiger.HandClient.HandClient"
                   android:label="@string/app_hand_name"
-                  android:icon="@drawable/icon"
+                  android:icon="@drawable/geiger"
                   android:screenOrientation="portrait" 
                   >
             <intent-filter>

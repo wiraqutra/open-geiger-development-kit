@@ -12,20 +12,31 @@ import org.fukushima.OpenGeiger.LocationAPIListener;
 import org.fukushima.OpenGeiger.R;
 import org.fukushima.OpenGeiger.WebAPI;
 import org.fukushima.OpenGeiger.WebAPIListener;
+import org.fukushima.OpenGeiger.HandClient.PinOverlay;
 import org.fukushima.OpenGeiger.R.id;
 import org.fukushima.OpenGeiger.R.layout;
 
+import com.google.android.maps.GeoPoint;
+import com.google.android.maps.MapActivity;
+import com.google.android.maps.MapController;
+import com.google.android.maps.MapView;
+
 import android.app.Activity;
+import android.app.Application;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
 import android.content.Context;
+import android.content.Intent;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.provider.Settings;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.Window;
@@ -34,7 +45,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class GeigerClient extends Activity implements OnClickListener, ClientThreadListener, ConnectedThreadListener, WebAPIListener, LocationAPIListener {
+public class GeigerClient extends MapActivity implements OnClickListener, ClientThreadListener, ConnectedThreadListener, WebAPIListener, LocationAPIListener {
 	
 	/**
 	 * Tag
@@ -92,14 +103,39 @@ public class GeigerClient extends Activity implements OnClickListener, ClientThr
 	private double lat;
 	
 	/**
+	 * MapView
+	 */
+	private MapView mMap;
+	
+	/**
+	 * MapController
+	 */
+	private MapController mMapController;
+	
+	/**
+	 * Pin
+	 */
+	private Drawable mPin;
+	
+	/**
+	 * Pin Overlay
+	 */
+	private PinOverlay mOverlay;
+	
+	/**
+	 * Application
+	 */
+	private Application mApplication;
+	
+	/**
 	 * ImageView
 	 */
 	ImageView icon_bluetooth;
 	ImageView icon_geiger;
 	
-	Button button01;
-	Button button02;
-	Button button03;
+	
+	Button buttonOn;
+	Button buttonUpload;
 	
 	int now_value;
 	
@@ -125,14 +161,30 @@ public class GeigerClient extends Activity implements OnClickListener, ClientThr
     	
     	setContentView(R.layout.main);
         mContext = this.getBaseContext();
+        mApplication = this.getApplication();
+        
+        mMap = (MapView)findViewById(R.id.mapView); 
+    	mMapController = mMap.getController();
+    	mMapController.setZoom(16);
+    	
+    	//アイコンリソース取得
+        mPin = getResources().getDrawable( R.drawable.pin);
+        
+    	 //SampleItemizedOverrayのインスタンスにアイコン登録
+        mOverlay = new PinOverlay(mPin);
+        mMap.getOverlays().add(mOverlay);
+        
+    	locationAPI = new LocationAPI(mApplication);
+		locationAPI.setEventListener(this);
+    	locationAPI.getGps();
+    	
+        // Satrt Server Button
+        buttonOn = (Button)findViewById(R.id.Button02);
+        buttonOn.setOnClickListener(this);
         
         // Satrt Server Button
-        button02 = (Button)findViewById(R.id.Button02);
-        button02.setOnClickListener(this);
-        
-     // Satrt Server Button
-        button03 = (Button)findViewById(R.id.Button03);
-        button03.setOnClickListener(this);
+        buttonUpload = (Button)findViewById(R.id.Button03);
+        buttonUpload.setOnClickListener(this);
        
         // TextView of Value
         mTextView = (TextView)findViewById(R.id.value);
@@ -157,24 +209,28 @@ public class GeigerClient extends Activity implements OnClickListener, ClientThr
 			}
 		}
 		
-		locationAPI = new LocationAPI(this.getApplication());
-		locationAPI.setEventListener(this);
+		
         
     }
     
 	@Override
 	public void onClick(View view) {
 		// Start Button 
-		if(view.equals(button02)){
-    		clientThread = new ClientThread(mDevice, MY_UUID );
-    		clientThread.setListener(this);
-    		mAdapter.cancelDiscovery();
+		if(view.equals(buttonOn)){
+			try{
+				clientThread = new ClientThread(mDevice, MY_UUID );
+				clientThread.setListener(this);
+				mAdapter.cancelDiscovery();
     		
-    		clientThread.start();
-    		locationAPI.getGps();
+				clientThread.start();
+				locationAPI.getGps();
+			}
+			catch(Exception e){
+				Toast.makeText(this, "Can't connect GeigerCouner", Toast.LENGTH_LONG).show();
+			}
 		}
 		// Upload Button
-		else if(view.equals(button03)){
+		else if(view.equals(buttonUpload)){
 			WebAPI webAPI = new WebAPI();
     		webAPI.setEventListener(this);
     		
@@ -281,9 +337,43 @@ public class GeigerClient extends Activity implements OnClickListener, ClientThr
 	}
 
 	@Override
-	public void onGpsLoad(double lat, double lon) {
-		// TODO Auto-generated method stub
-		this.lat = lat;
-		this.lon = lon;
+	public void onGpsLoad(double lat, double lon) {	
+		GeoPoint point = new GeoPoint((int)(lat * 1e6),  (int)(lon * 1e6));  
+        mMapController.animateTo(point);  
+        
+        mOverlay.clearPoint();
+        mOverlay.addPoint(point);
+        
+        
+        this.lat = lat;
+        this.lon = lon;
+        
+        locationAPI.removeGps();
 	}
+	
+	@Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        menu.add(Menu.NONE, 1, Menu.NONE, "Hand Client");
+        return super.onCreateOptionsMenu(menu);
+    }
+	
+	@Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        boolean ret = true;
+        switch (item.getItemId()) {
+        case 1:
+        	Intent selectIntent = new Intent();
+        	selectIntent.setClassName("org.fukushima.OpenGeiger","org.fukushima.OpenGeiger.HandClient.HandClient");
+        	startActivity(selectIntent);
+            break;
+        }
+        return ret;
+    }
+
+	@Override
+	protected boolean isRouteDisplayed() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+	
 }

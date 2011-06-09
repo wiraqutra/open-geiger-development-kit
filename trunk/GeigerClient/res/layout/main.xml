@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
-    android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
-    android:background="@drawable/phone"
-    >
-    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:orientation="vertical" 
+	android:layout_width="fill_parent"
+	android:layout_height="fill_parent"
+	android:background="@drawable/phone"
+	>
+	
+   <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     	android:orientation="horizontal"
     	android:layout_width="fill_parent"
     	android:layout_height="wrap_content"
@@ -46,13 +47,33 @@
 		android:layout_gravity="center"
 	>
 	</TextView>
+	<LinearLayout 
+		xmlns:android="http://schemas.android.com/apk/res/android"
+		android:orientation="horizontal" 
+		android:layout_width="fill_parent"
+		android:layout_height="wrap_content" 
+		android:background="#000000"
+		android:paddingBottom="10dip"
+		android:paddingLeft="10dip"
+		android:paddingRight="10dip"
+		>
+
+		<com.google.android.maps.MapView
+			android:id="@+id/mapView" 
+			android:layout_width="fill_parent"
+			android:layout_height="200dip" 
+			android:enabled="true"
+			android:clickable="true" 
+			android:apiKey="0-3NMmILBV71JRGkmp6n4b9GcNQ1OnOxBquJ8Bg" />
+	</LinearLayout>
+	
 	 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     	android:orientation="horizontal"
     	android:layout_width="fill_parent"
     	android:layout_height="wrap_content"
     	android:layout_gravity="center"
     	android:gravity="center"
-    	android:layout_marginTop="100px"
+    	android:layout_marginTop="10px"
     	>
 	    <Button android:text="ON" 
 	        android:id="@+id/Button02" 
@@ -69,7 +90,7 @@
 	        >
 	    </Button>
    </LinearLayout>
- 
-    
+   
+   
 
 </LinearLayout>
