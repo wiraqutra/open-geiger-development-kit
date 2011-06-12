@@ -2,7 +2,7 @@
 
 = Introduction =
 
-Add your content here.
+List of Geiger Muller Tube
 
 
 = Details =
@@ -10,4 +10,3 @@ Add your content here.
 List of Muller Tube
   * SBM20
   * Raytheon CK1026
-  * Automatic links to other wiki pages
