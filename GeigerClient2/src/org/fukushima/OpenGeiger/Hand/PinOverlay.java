@@ -1,4 +1,4 @@
-package org.fukushima.OpenGeiger.AutoClient;
+package org.fukushima.OpenGeiger.Hand;
 
 import java.util.ArrayList;
 import java.util.List;

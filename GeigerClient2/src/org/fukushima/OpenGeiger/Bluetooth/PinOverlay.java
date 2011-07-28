@@ -1,4 +1,4 @@
-package org.fukushima.OpenGeiger.HandClient;
+package org.fukushima.OpenGeiger.Bluetooth;
 
 import java.util.ArrayList;
 import java.util.List;

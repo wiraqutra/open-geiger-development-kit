@@ -1,4 +1,4 @@
-package org.fukushima.OpenGeiger.AutoClient;
+package org.fukushima.OpenGeiger.Hand;
 
 import com.google.android.maps.GeoPoint;
 import com.google.android.maps.OverlayItem;
