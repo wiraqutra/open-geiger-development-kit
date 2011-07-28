@@ -1,4 +1,4 @@
-package org.fukushima.OpenGeiger.HandClient;
+package org.fukushima.OpenGeiger.Hand;
 
 import java.io.IOException;
 import java.util.List;

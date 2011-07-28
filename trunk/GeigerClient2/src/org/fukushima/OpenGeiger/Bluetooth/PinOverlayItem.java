@@ -1,4 +1,4 @@
-package org.fukushima.OpenGeiger.HandClient;
+package org.fukushima.OpenGeiger.Bluetooth;
 
 import com.google.android.maps.GeoPoint;
 import com.google.android.maps.OverlayItem;

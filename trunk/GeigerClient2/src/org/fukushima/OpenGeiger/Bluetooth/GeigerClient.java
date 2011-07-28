@@ -1,4 +1,4 @@
-package org.fukushima.OpenGeiger.AutoClient;
+package org.fukushima.OpenGeiger.Bluetooth;
 
 import java.util.Set;
 import java.util.UUID;
@@ -12,7 +12,7 @@ import org.fukushima.OpenGeiger.LocationAPIListener;
 import org.fukushima.OpenGeiger.R;
 import org.fukushima.OpenGeiger.WebAPI;
 import org.fukushima.OpenGeiger.WebAPIListener;
-import org.fukushima.OpenGeiger.HandClient.PinOverlay;
+import org.fukushima.OpenGeiger.Hand.PinOverlay;
 import org.fukushima.OpenGeiger.R.id;
 import org.fukushima.OpenGeiger.R.layout;
 

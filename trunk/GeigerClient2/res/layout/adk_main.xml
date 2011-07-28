@@ -10,20 +10,20 @@
     	android:orientation="horizontal"
     	android:layout_width="fill_parent"
     	android:layout_height="wrap_content"
-    	android:layout_marginTop="30px"
-    	android:layout_marginLeft="10px"
-    	android:layout_marginRight="10px"
+    	android:layout_marginTop="30dip"
+    	android:layout_marginLeft="10dip"
+    	android:layout_marginRight="10dip"
     	>
     	<ImageView 
-    		android:id="@+id/icon_bluetooth" 
-        	android:layout_width="30px"
-        	android:layout_height="30px"
-        	android:src="@drawable/bluetooth"
+    		android:id="@+id/icon_adk" 
+        	android:layout_width="20dip"
+        	android:layout_height="20dip"
+        	android:src="@drawable/adk"
 		/>
 		<ImageView 
 			android:id="@+id/icon_geiger" 
-        	android:layout_width="30px"
-        	android:layout_height="30px"
+        	android:layout_width="20dip"
+        	android:layout_height="20dip"
         	android:src="@drawable/geiger"
 		/>
 		<TextView
@@ -75,13 +75,6 @@
     	android:gravity="center"
     	android:layout_marginTop="10px"
     	>
-	    <Button android:text="ON" 
-	        android:id="@+id/Button02" 
-	        android:layout_width="100px" 
-	        android:layout_height="100px"
-	        android:textSize="30px"
-	        >
-	    </Button>
 	     <Button android:text="Up" 
 	        android:id="@+id/Button03" 
 	        android:layout_width="100px" 
