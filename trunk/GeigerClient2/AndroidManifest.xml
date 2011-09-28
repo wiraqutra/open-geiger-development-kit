@@ -8,7 +8,7 @@
 
     <application android:icon="@drawable/icon" android:label="@string/app_name">
        
-        <activity android:name="org.fukushima.OpenGeiger.Bluetooth.GeigerClient"
+        <activity android:name=".Bluetooth.BluetoothClient"
         		  android:icon="@drawable/geiger"
                   android:label="@string/app_name_bluetooth"
                   android:screenOrientation="portrait" 

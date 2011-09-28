@@ -419,7 +419,7 @@ public class ADKClient extends MapActivity implements Runnable, OnClickListener,
 			
 			case 3:
 				Intent bluetoothIntent = new Intent();
-				bluetoothIntent.setClassName("org.fukushima.OpenGeiger", "org.fukushima.OpenGeiger.Auto.AutoClient");
+				bluetoothIntent.setClassName("org.fukushima.OpenGeiger", "org.fukushima.OpenGeiger.Bluetooth.BluetoothClient");
 				startActivity(bluetoothIntent);
 				break;
 			default:

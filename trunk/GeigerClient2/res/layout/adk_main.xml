@@ -64,7 +64,7 @@
 			android:layout_height="200dip" 
 			android:enabled="true"
 			android:clickable="true" 
-			android:apiKey="0-3NMmILBV733nwhTfEhoUvw0qprykSessV3LKw" />
+			android:apiKey="0TDmZA-J8BBA11hhGArVPG4GU3LzBMoHgymHhbA" />
 	</LinearLayout>
 	
 	 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
