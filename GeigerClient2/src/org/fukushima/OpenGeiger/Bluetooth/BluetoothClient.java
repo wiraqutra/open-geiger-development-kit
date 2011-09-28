@@ -46,7 +46,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class GeigerClient extends MapActivity implements OnClickListener, ClientThreadListener, ConnectedThreadListener, WebAPIListener, LocationAPIListener {
+public class BluetoothClient extends MapActivity implements OnClickListener, ClientThreadListener, ConnectedThreadListener, WebAPIListener, LocationAPIListener {
 	
 	/**
 	 * Tag
@@ -362,7 +362,9 @@ public class GeigerClient extends MapActivity implements OnClickListener, Client
 	
 	@Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        menu.add(Menu.NONE, 1, Menu.NONE, "Hand Client");
+        menu.add(Menu.NONE, 1, Menu.NONE, "AR Client");
+        menu.add(Menu.NONE, 2, Menu.NONE, "Hand Client");
+        menu.add(Menu.NONE, 3, Menu.NONE, "ADK Client");
         return super.onCreateOptionsMenu(menu);
     }
 	
@@ -371,10 +373,22 @@ public class GeigerClient extends MapActivity implements OnClickListener, Client
         boolean ret = true;
         switch (item.getItemId()) {
         case 1:
-        	Intent selectIntent = new Intent();
-        	selectIntent.setClassName("org.fukushima.OpenGeiger","org.fukushima.OpenGeiger.HandClient.HandClient");
-        	startActivity(selectIntent);
-            break;
+			Intent arIntent = new Intent();
+			arIntent.setClassName("org.fukushima.OpenGeiger", "org.fukushima.OpenGeiger.AR.ARClient");
+			startActivity(arIntent);
+			break;
+		
+		case 2:
+			Intent handIntent = new Intent();
+			handIntent.setClassName("org.fukushima.OpenGeiger", "org.fukushima.OpenGeiger.Hand.HandClient");
+			startActivity(handIntent);
+			break;
+		
+		case 3:
+			Intent bluetoothIntent = new Intent();
+			bluetoothIntent.setClassName("org.fukushima.OpenGeiger", "org.fukushima.OpenGeiger.ADK.ADKClient");
+			startActivity(bluetoothIntent);
+			break;
         }
         return ret;
     }

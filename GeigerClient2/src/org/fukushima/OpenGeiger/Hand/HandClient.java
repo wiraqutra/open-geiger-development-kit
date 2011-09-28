@@ -145,7 +145,7 @@ public class HandClient extends MapActivity implements WebAPIListener, LocationA
 			
 		}
 		
-		/*
+		
     	//アイコンリソース取得
         mPin = getResources().getDrawable( R.drawable.pin);
   
@@ -218,7 +218,7 @@ public class HandClient extends MapActivity implements WebAPIListener, LocationA
         		
         	}
         });
-        */
+        
        
     }
 
@@ -242,7 +242,7 @@ public class HandClient extends MapActivity implements WebAPIListener, LocationA
 
 	@Override
 	public void onGpsLoad(double lat, double lon) {	
-		/*
+		
 		GeoPoint point = new GeoPoint((int)(lat * 1e6),  (int)(lon * 1e6));  
         mMapController.animateTo(point);  
         
@@ -256,7 +256,7 @@ public class HandClient extends MapActivity implements WebAPIListener, LocationA
         saveGps(lat,lon);
         
         locationAPI.removeGps();
-        */
+        
 	}
 
 	@Override
@@ -267,17 +267,28 @@ public class HandClient extends MapActivity implements WebAPIListener, LocationA
 
 	@Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        menu.add(Menu.NONE, 1, Menu.NONE, "Auto Client");
+        menu.add(Menu.NONE, 1, Menu.NONE, "AR Client");
+        menu.add(Menu.NONE, 2, Menu.NONE, "ADK Client");
+        menu.add(Menu.NONE, 3, Menu.NONE, "Bluetooth Client");
         return super.onCreateOptionsMenu(menu);
     }
 	
 	@Override
     public boolean onOptionsItemSelected(MenuItem item) {
         boolean ret = true;
+        Intent selectIntent = new Intent();
         switch (item.getItemId()) {
+        
         case 1:
-        	Intent selectIntent = new Intent();
-        	selectIntent.setClassName("org.fukushima.OpenGeiger","org.fukushima.OpenGeiger.AutoClient.GeigerClient");
+        	selectIntent.setClassName("org.fukushima.OpenGeiger","org.fukushima.OpenGeiger.AR.ARClient");
+        	startActivity(selectIntent);
+            break;
+        case 2:
+        	selectIntent.setClassName("org.fukushima.OpenGeiger","org.fukushima.OpenGeiger.ADK.ADKClient");
+        	startActivity(selectIntent);
+            break;
+        case 3:
+        	selectIntent.setClassName("org.fukushima.OpenGeiger","org.fukushima.OpenGeiger.Bluetooth.BluetoothClient");
         	startActivity(selectIntent);
             break;
         }
