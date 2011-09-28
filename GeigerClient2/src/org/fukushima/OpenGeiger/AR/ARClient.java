@@ -54,8 +54,7 @@ import android.view.ViewGroup.LayoutParams;
 import android.widget.ImageView;
 import android.widget.Toast;
 
-public class ARClient extends Activity implements Runnable,
-		SensorEventListener, LocationListener {
+public class ARClient extends Activity implements Runnable, SensorEventListener, LocationListener {
 
 	/**
 	 * Tag
@@ -106,17 +105,17 @@ public class ARClient extends Activity implements Runnable,
 	 * Usb Manager
 	 */
 	private UsbManager mUsbManager;
-	
+
 	/**
 	 * Calculating and Display Radio Activity
 	 */
 	private final static int CALC_RADIOACTIVITY = 101;
-	
+
 	/**
 	 * Calculating and Display Distance from land
 	 */
 	private final static int CALC_DISTANCE = 102;
-	
+
 	private final static int ICON_BT = 2;
 	private final static int ICON_VISIBLE_GG = 3;
 	private final static int ICON_INVISIBLE_GG = 4;
@@ -176,8 +175,7 @@ public class ARClient extends Activity implements Runnable,
 		 * lm.getLastKnownLocation(provider);
 		 */
 
-		vibrator = (Vibrator) mContext
-				.getSystemService(Context.VIBRATOR_SERVICE);
+		vibrator = (Vibrator) mContext.getSystemService(Context.VIBRATOR_SERVICE);
 		Resources res = this.getBaseContext().getResources();
 		mTitle = BitmapFactory.decodeResource(res, R.drawable.title);
 		// サウンドデータの読み込み(res/raw/sound.wav)
@@ -190,24 +188,24 @@ public class ARClient extends Activity implements Runnable,
 		setContentView(mPreview);
 
 		mView = new MyView(this);
-		addContentView(mView, new LayoutParams(LayoutParams.WRAP_CONTENT,
-				LayoutParams.WRAP_CONTENT));
+		addContentView(mView, new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
 
 		// get instance of Usb Manager
 		mUsbManager = UsbManager.getInstance(this);
-		mPermissionIntent = PendingIntent.getBroadcast(this, 0, new Intent(
-				ACTION_USB_PERMISSION), 0);
+		mPermissionIntent = PendingIntent.getBroadcast(this, 0, new Intent(ACTION_USB_PERMISSION), 0);
 		IntentFilter filter = new IntentFilter(ACTION_USB_PERMISSION);
 		filter.addAction(UsbManager.ACTION_USB_ACCESSORY_DETACHED);
 		registerReceiver(mUsbReceiver, filter);
 
-		Log.i(TAG, "getLastNonConfigurationInstance()"
-				+ getLastNonConfigurationInstance());
+		Log.i(TAG, "getLastNonConfigurationInstance()" + getLastNonConfigurationInstance());
 		if (getLastNonConfigurationInstance() != null) {
 			mAccessory = (UsbAccessory) getLastNonConfigurationInstance();
 			openAccessory(mAccessory);
 		} else {
-			/*Toast.makeText(this, "Not connect Geiger Counter",Toast.LENGTH_LONG).show();*/
+			/*
+			 * Toast.makeText(this,
+			 * "Not connect Geiger Counter",Toast.LENGTH_LONG).show();
+			 */
 		}
 		enableControls(true);
 
@@ -224,8 +222,7 @@ public class ARClient extends Activity implements Runnable,
 	public void onSensorChanged(SensorEvent event) {
 		// TODO Auto-generated method stub
 		if (event.sensor.getType() == Sensor.TYPE_ORIENTATION) {
-			mView.setOrientationString((int) event.values[0],
-					(int) event.values[1], (int) event.values[2]);
+			mView.setOrientationString((int) event.values[0], (int) event.values[1], (int) event.values[2]);
 		}
 	}
 
@@ -238,8 +235,7 @@ public class ARClient extends Activity implements Runnable,
 
 		if (sensors.size() > 0) {
 			Sensor sensor = (Sensor) sensors.get(0);
-			mRegisteredSensor = mSensorManager.registerListener(this, sensor,
-					SensorManager.SENSOR_DELAY_FASTEST);
+			mRegisteredSensor = mSensorManager.registerListener(this, sensor, SensorManager.SENSOR_DELAY_FASTEST);
 		}
 
 		Intent intent = getIntent();
@@ -255,8 +251,7 @@ public class ARClient extends Activity implements Runnable,
 			} else {
 				synchronized (mUsbReceiver) {
 					if (!mPermissionRequestPending) {
-						mUsbManager.requestPermission(accessory,
-								mPermissionIntent);
+						mUsbManager.requestPermission(accessory, mPermissionIntent);
 						mPermissionRequestPending = true;
 					}
 				}
@@ -304,8 +299,7 @@ public class ARClient extends Activity implements Runnable,
 	public void onLocationChanged(Location location) {
 		Log.i(TAG, "onLocationChanged");
 
-		mView.setLocaionString("" + location.getLatitude(),
-				"" + location.getLongitude());
+		mView.setLocaionString("" + location.getLatitude(), "" + location.getLongitude());
 
 		// 原発座標
 		Location genpatsuLocation = new Location("genpatsu");
@@ -341,12 +335,10 @@ public class ARClient extends Activity implements Runnable,
 			if (ACTION_USB_PERMISSION.equals(action)) {
 				synchronized (this) {
 					UsbAccessory accessory = UsbManager.getAccessory(intent);
-					if (intent.getBooleanExtra(
-							UsbManager.EXTRA_PERMISSION_GRANTED, false)) {
+					if (intent.getBooleanExtra(UsbManager.EXTRA_PERMISSION_GRANTED, false)) {
 						openAccessory(accessory);
 					} else {
-						Log.d(TAG, "permission denied for accessory "
-								+ accessory);
+						Log.d(TAG, "permission denied for accessory " + accessory);
 					}
 					mPermissionRequestPending = false;
 				}
@@ -413,7 +405,7 @@ public class ARClient extends Activity implements Runnable,
 				switch (buffer[i]) {
 				case 0x1:
 					if (len >= 3) {
-						Log.i(TAG,"value0x1:" + composeInt(buffer[i + 1], buffer[i + 2]));
+						Log.i(TAG, "value0x1:" + composeInt(buffer[i + 1], buffer[i + 2]));
 						Log.i(TAG, "bf1:" + buffer[i + 1]);
 						Log.i(TAG, "bf2:" + buffer[i + 2]);
 					}
@@ -422,7 +414,7 @@ public class ARClient extends Activity implements Runnable,
 
 				case 0x4:
 					if (len >= 3) {
-						Log.i(TAG,"value0x4:" + composeInt(buffer[i + 1], buffer[i + 2]));
+						Log.i(TAG, "value0x4:" + composeInt(buffer[i + 1], buffer[i + 2]));
 						Log.i(TAG, "bf1:" + buffer[i + 1]);
 						Log.i(TAG, "bf2:" + buffer[i + 2]);
 					}
@@ -431,10 +423,10 @@ public class ARClient extends Activity implements Runnable,
 				// Value of Geiger Counter
 				case 0x5:
 					if (len >= 3) {
-						Log.i(TAG,"value0x5:" + composeInt(buffer[i + 1], buffer[i + 2]));
+						Log.i(TAG, "value0x5:" + composeInt(buffer[i + 1], buffer[i + 2]));
 						Log.i(TAG, "bf1:" + buffer[i + 1]);
 						Log.i(TAG, "bf2:" + buffer[i + 2]);
-						
+
 						Message m = Message.obtain(mHandler, CALC_RADIOACTIVITY);
 						int value = composeInt(buffer[i + 1], buffer[i + 2]);
 						if (value > 0) {
@@ -450,15 +442,15 @@ public class ARClient extends Activity implements Runnable,
 
 				case 0x6:
 					if (len >= 3) {
-						Log.i(TAG,"value0x6:" + composeInt(buffer[i + 1], buffer[i + 2]));
+						Log.i(TAG, "value0x6:" + composeInt(buffer[i + 1], buffer[i + 2]));
 						Log.i(TAG, "bf1:" + buffer[i + 1]);
 						Log.i(TAG, "bf2:" + buffer[i + 2]);
-						
+
 						Message m = Message.obtain(mHandler, CALC_DISTANCE);
 						int value = composeInt(buffer[i + 1], buffer[i + 2]);
 						if (value > 0) {
-							value =  - (value - 600) / 10;
-							if(value < 0){
+							value = -(value - 600) / 10;
+							if (value < 0) {
 								value = 0;
 							}
 							m.arg1 = value;
@@ -536,9 +528,10 @@ public class ARClient extends Activity implements Runnable,
 			}
 		}
 	};
-	
+
 	/**
 	 * Menu
+	 * 
 	 * @param menu
 	 * @return
 	 */
@@ -554,25 +547,25 @@ public class ARClient extends Activity implements Runnable,
 	public boolean onOptionsItemSelected(MenuItem item) {
 		boolean ret = true;
 		switch (item.getItemId()) {
-			case 1:
-				Intent arIntent = new Intent();
-				arIntent.setClassName("org.fukushima.OpenGeiger", "org.fukushima.OpenGeiger.ADK.ADKClient");
-				startActivity(arIntent);
-				break;
-			
-			case 2:
-				Intent handIntent = new Intent();
-				handIntent.setClassName("org.fukushima.OpenGeiger", "org.fukushima.OpenGeiger.Hand.HandClient");
-				startActivity(handIntent);
-				break;
-			
-			case 3:
-				Intent bluetoothIntent = new Intent();
-				bluetoothIntent.setClassName("org.fukushima.OpenGeiger", "org.fukushima.OpenGeiger.Bluetooth.BluetoothClient");
-				startActivity(bluetoothIntent);
-				break;
-			default:
-				break;
+		case 1:
+			Intent arIntent = new Intent();
+			arIntent.setClassName("org.fukushima.OpenGeiger", "org.fukushima.OpenGeiger.ADK.ADKClient");
+			startActivity(arIntent);
+			break;
+
+		case 2:
+			Intent handIntent = new Intent();
+			handIntent.setClassName("org.fukushima.OpenGeiger", "org.fukushima.OpenGeiger.Hand.HandClient");
+			startActivity(handIntent);
+			break;
+
+		case 3:
+			Intent bluetoothIntent = new Intent();
+			bluetoothIntent.setClassName("org.fukushima.OpenGeiger", "org.fukushima.OpenGeiger.Bluetooth.BluetoothClient");
+			startActivity(bluetoothIntent);
+			break;
+		default:
+			break;
 		}
 		return ret;
 	}
@@ -604,7 +597,7 @@ class MyView extends View {
 	 * 地表からの距離
 	 */
 	private float distance;
-	
+
 	/**
 	 * 福島原発からの距離
 	 */
@@ -678,7 +671,7 @@ class MyView extends View {
 			formatCount = "Calculating...";
 		}
 		canvas.drawText(formatCount, 500, 60, textRadioPaint);
-		
+
 		// 文字の色を設定
 		Paint textDistancePaint = new Paint();
 		textDistancePaint.setStyle(Paint.Style.FILL);
@@ -701,8 +694,7 @@ class MyView extends View {
 		textGenpatsuPaint.setTextSize(30);
 		textGenpatsuPaint.setARGB(255, 255, 0, 0);
 
-		canvas.drawText("From fukushima : " + fukushima + "m", 20, 440,
-				textGenpatsuPaint);
+		canvas.drawText("From fukushima : " + fukushima + "m", 20, 440, textGenpatsuPaint);
 
 	}
 
@@ -774,7 +766,7 @@ class MyView extends View {
 		/* 再描画の指示 */
 		invalidate();
 	}
-	
+
 	/**
 	 * 福島からの距離の設定
 	 */
@@ -812,15 +804,15 @@ class Preview extends SurfaceView implements SurfaceHolder.Callback {
 	public void surfaceCreated(SurfaceHolder holder) {
 		// The Surface has been created, acquire the camera and tell it where
 		// to draw.
-		
-		try{
+
+		try {
 			mCamera = Camera.open();
-		}catch(Exception e){
-			
+		} catch (Exception e) {
+
 			mCamera = null;
 			mCamera = Camera.open();
 		}
-		
+
 		try {
 			mCamera.setPreviewDisplay(holder);
 		} catch (IOException exception) {

@@ -27,7 +27,6 @@ public class WebAPI {
 	 */
 	private static final String TAG = "WEB_API";
 
-	
 	/**
 	 * BindするContext
 	 */
@@ -37,63 +36,81 @@ public class WebAPI {
 	 * Upload URL
 	 */
 	private static final String URL_UPLOAD = "http://geigerapi.appspot.com/upload";
-	
+
 	/**
 	 * Action ID of Upload
 	 */
 	private static final int ACT_UPLOAD = 1;
-	
+
 	/**
 	 * Event Listener
 	 */
 	private WebAPIListener mWebAPIListener;
 
+	/**
+	 * Constructor
+	 */
 	public WebAPI() {
 
 	}
 
+	/**
+	 * Constructor
+	 */
 	public WebAPI(Context context) {
 		this.mContext = context;
 	}
-	
-	public void sendData(String[] key, String[] value){
-		PostThread mPostThread = new PostThread(ACT_UPLOAD, URL_UPLOAD ,key, value);
+
+	/**
+	 * Upload data
+	 * 
+	 * @param key
+	 * @param value
+	 */
+	public void sendData(String[] key, String[] value) {
+		PostThread mPostThread = new PostThread(ACT_UPLOAD, URL_UPLOAD, key, value);
 		mPostThread.start();
 	}
-	
+
+	/**
+	 * Thread for upload
+	 * 
+	 * @author gclue_akira
+	 * 
+	 */
 	private class PostThread extends Thread {
 		private String url;
 		private int type;
 		private List<NameValuePair> postParams;
-		
-	    public PostThread(int type, String url,String[] key, String[] value) {
-	    	this.url = url;
-	    	this.type = type;
-			postParams = new ArrayList<NameValuePair>(); 
-			for(int i = 0; i < key.length; i++){
-				postParams.add(new BasicNameValuePair(key[i],value[i]));
-			}
-	    }
 
-	    public void run() {
-	    	HttpClient mHttp = new DefaultHttpClient();
+		public PostThread(int type, String url, String[] key, String[] value) {
+			this.url = url;
+			this.type = type;
+			postParams = new ArrayList<NameValuePair>();
+			for (int i = 0; i < key.length; i++) {
+				postParams.add(new BasicNameValuePair(key[i], value[i]));
+			}
+		}
+
+		public void run() {
+			HttpClient mHttp = new DefaultHttpClient();
 
 			try {
-				HttpPost postMethod   = new HttpPost(url);
-	    	
+				HttpPost postMethod = new HttpPost(url);
+
 				// Header of Post
-				postMethod.setHeader("Content-Type","application/x-www-form-urlencoded");
-				
+				postMethod.setHeader("Content-Type", "application/x-www-form-urlencoded");
+
 				// UrlEncode
 				UrlEncodedFormEntity sendData = new UrlEncodedFormEntity(postParams, "UTF-8");
 				postMethod.setEntity(sendData);
-				
+
 				// Connect
 				HttpResponse mResponse = mHttp.execute(postMethod);
-				if(DEBUG){
-					Log.i(TAG,"connecting");
+				if (DEBUG) {
+					Log.i(TAG, "connecting");
 				}
-				
+
 				// Response Code
 				int resCode = mResponse.getStatusLine().getStatusCode();
 				// Response Type
@@ -101,29 +118,27 @@ public class WebAPI {
 				// Response Value
 				HttpEntity httpEntity = mResponse.getEntity();
 				String resValue = EntityUtils.toString(httpEntity);
-				
-				if(DEBUG){
-					Log.i(TAG,"resCode:"+ resCode);
-					Log.i(TAG,"resType:"+ resType);
-					Log.i(TAG,"resValue:"+ resValue);
+
+				if (DEBUG) {
+					Log.i(TAG, "resCode:" + resCode);
+					Log.i(TAG, "resType:" + resType);
+					Log.i(TAG, "resValue:" + resValue);
 				}
-				
-				
+
 				// OK
-				if (resCode == HttpStatus.SC_OK){
-					mWebAPIListener.onLoad(type,resValue);
+				if (resCode == HttpStatus.SC_OK) {
+					mWebAPIListener.onLoad(type, resValue);
 				}
 				// NG
-				else{
-					
-					mWebAPIListener.onLoad(type,"-1");
+				else {
+
+					mWebAPIListener.onLoad(type, "-1");
 				}
-			} catch (IOException e) 
-			{
+			} catch (IOException e) {
 				// Error
-				mWebAPIListener.onLoad(type,"-1");
+				mWebAPIListener.onLoad(type, "-1");
 			}
-	    }
+		}
 	}
 
 	/**
