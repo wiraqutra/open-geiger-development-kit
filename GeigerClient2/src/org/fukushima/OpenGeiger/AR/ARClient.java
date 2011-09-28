@@ -20,6 +20,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.res.Resources;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -67,33 +69,68 @@ public class ARClient extends Activity implements Runnable,
 	 * Application
 	 */
 	private Application mApplication;
-
+	
+	/**
+	 * USB Accessory
+	 */
 	private UsbAccessory mAccessory;
+	
 	private ParcelFileDescriptor mFileDescriptor;
 	private FileInputStream mInputStream;
 	private FileOutputStream mOutputStream;
+	
+	/**
+	 * CameraView for AR
+	 */
 	private Preview mPreview;
+	
+	/**
+	 * Overlay用のView
+	 */
 	private MyView mView;
+	
+	/**
+	 * Registered Sensor
+	 */
 	private boolean mRegisteredSensor;
+	/**
+	 * Sensor Manager
+	 */
+	
 	private SensorManager mSensorManager = null;
 	private LocationManager lm;
+	
 	/**
 	 * Usb Manager
 	 */
 	private UsbManager mUsbManager;
+	
 	private final static int CALC = 1;
 	private final static int ICON_BT = 2;
 	private final static int ICON_VISIBLE_GG = 3;
 	private final static int ICON_INVISIBLE_GG = 4;
 	private final static int CALCING = 5;
 	private final static int DEVICE = 10;
+	
 	/**
 	 * PendingIntent
 	 */
 	private PendingIntent mPermissionIntent;
 	private boolean mPermissionRequestPending;
+	
+	/**
+	 * Media Player
+	 */
 	private MediaPlayer mMp;
+	
+	/**
+	 * Vibrator
+	 */
 	private Vibrator vibrator;
+	
+	/**
+	 * Image
+	 */
 	private Drawable image;
 
 	/**
@@ -105,7 +142,11 @@ public class ARClient extends Activity implements Runnable,
 	 * Action Name of connecting USB
 	 */
 	private static final String ACTION_USB_PERMISSION = "com.google.android.DemoKit.action.USB_PERMISSION";
-
+	/**
+	 * 画像を格納する変数
+	 */
+	 private Bitmap mTitle; 
+	
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -129,7 +170,7 @@ public class ARClient extends Activity implements Runnable,
 		vibrator = (Vibrator) mContext
 				.getSystemService(Context.VIBRATOR_SERVICE);
 		Resources res = this.getBaseContext().getResources();
-
+		mTitle = BitmapFactory.decodeResource(res, R.drawable.title);
 		// サウンドデータの読み込み(res/raw/sound.wav)
 		mMp = MediaPlayer.create(mContext, R.raw.sound);
 		// タイトルを消す
@@ -222,6 +263,7 @@ public class ARClient extends Activity implements Runnable,
 
 	@Override
 	protected void onPause() {
+		
 		if (mRegisteredSensor) {
 			mSensorManager.unregisterListener(this);
 			mRegisteredSensor = false;
@@ -229,13 +271,16 @@ public class ARClient extends Activity implements Runnable,
 		if (lm != null) {
 			lm.removeUpdates(this);
 		}
-
-		super.onPause();
+		
+		// Close usb Accessory
 		closeAccessory();
+		
+		super.onPause();
 	}
 
 	@Override
 	public void onDestroy() {
+		// unregister listener
 		unregisterReceiver(mUsbReceiver);
 		super.onDestroy();
 	}
@@ -459,9 +504,6 @@ public class ARClient extends Activity implements Runnable,
 			case CALC:
 				int cpm = counter - msg.arg1;
 				double sv = cpm * 0.00883 * 0.5;
-				// double sv = cpm * 0.00200;
-				NumberFormat format = NumberFormat.getInstance();
-				format.setMaximumFractionDigits(4);
 				mView.setCount(sv);
 
 				break;
@@ -498,6 +540,11 @@ class MyView extends View {
 	private float distance;
 
 	/**
+	 * Title
+	 */
+	private Bitmap mTitle;
+	
+	/**
 	 * コンストラクタ
 	 * 
 	 * @param c
@@ -505,6 +552,9 @@ class MyView extends View {
 	public MyView(Context c) {
 		super(c);
 		setFocusable(true);
+		
+		Resources res = c.getResources();
+		mTitle = BitmapFactory.decodeResource(res, R.drawable.title);
 	}
 
 	/**
@@ -514,8 +564,33 @@ class MyView extends View {
 		super.onDraw(canvas);
 
 		// 背景色を設定
-		canvas.drawColor(Color.TRANSPARENT);
-
+		// A,R,G,Bで指定
+		int alpha = 0;
+		if(count < 0.1){
+			alpha = 0;
+		}
+		else if(count < 0.2){
+			alpha = 50;
+		}
+		else if(count < 0.3){
+			alpha = 100;
+		}
+		else if(count < 0.4){
+			alpha = 150;
+		}
+		else if(count < 0.5){
+			alpha = 200;
+		}
+		else if(count < 0.6){
+			alpha = 250;
+		}
+		
+		canvas.drawColor(Color.argb(alpha, 255,0,0));
+		
+		Paint imagePaint = new Paint();
+		
+		canvas.drawBitmap(mTitle, 0, 0, imagePaint);
+		
 		// 文字の色を設定
 		Paint textOrientPaint = new Paint();
 		textOrientPaint.setStyle(Paint.Style.FILL);
@@ -523,17 +598,20 @@ class MyView extends View {
 		textOrientPaint.setARGB(255, 0, 255, 0);
 
 		// 文字を描画
-		canvas.drawText("roll  :" + ori_x, 600, 370, textOrientPaint);
-		canvas.drawText("yaw   :" + ori_y, 600, 390, textOrientPaint);
-		canvas.drawText("pitch :" + ori_z, 600, 410, textOrientPaint);
+		canvas.drawText("roll  :" + ori_x, 640, 390, textOrientPaint);
+		canvas.drawText("yaw   :" + ori_y, 640, 410, textOrientPaint);
+		canvas.drawText("pitch :" + ori_z, 640, 430, textOrientPaint);
 
 		// 文字の色を設定
 		Paint textRadioPaint = new Paint();
 		textRadioPaint.setStyle(Paint.Style.FILL);
 		textRadioPaint.setTextSize(50);
 		textRadioPaint.setARGB(255, 255, 0, 0);
-
-		canvas.drawText(count + "sv/h", 500, 60, textRadioPaint);
+		String formatCount = String.format("%.4f",count) + "sv/h";
+		if(count == 0){
+			formatCount = "Calculating...";
+		}
+		canvas.drawText(formatCount, 500, 60, textRadioPaint);
 
 		// 文字の色を設定
 		Paint textGpsPaint = new Paint();
@@ -541,8 +619,8 @@ class MyView extends View {
 		textGpsPaint.setTextSize(20);
 		textGpsPaint.setARGB(255, 255, 255, 255);
 
-		canvas.drawText("lat :" + latString, 20, 370, textGpsPaint);
-		canvas.drawText("lon :" + lonString, 20, 390, textGpsPaint);
+		canvas.drawText("lat :" + latString, 20, 390, textGpsPaint);
+		canvas.drawText("lon :" + lonString, 20, 410, textGpsPaint);
 
 		// 文字の色を設定
 		Paint textDistancePaint = new Paint();
@@ -550,16 +628,8 @@ class MyView extends View {
 		textDistancePaint.setTextSize(30);
 		textDistancePaint.setARGB(255, 255, 0, 0);
 
-		canvas.drawText("From fukushima : " + distance + "m", 20, 420,
+		canvas.drawText("From fukushima : " + distance + "m", 20, 440,
 				textDistancePaint);
-
-		/* 文字の色を設定 */
-		Paint dirTextPaint = new Paint();
-		dirTextPaint.setStyle(Paint.Style.FILL);
-		dirTextPaint.setARGB(255, 255, 0, 0);
-		dirTextPaint.setTextSize(32);
-		/* 文字を描画 */
-		// canvas.drawText(dirString, 155, 100, dirTextPaint);
 
 	}
 
