@@ -213,7 +213,11 @@ public class ADKClient extends MapActivity implements Runnable, OnClickListener,
 
 		// load the data of sound
 		mMp = MediaPlayer.create(mContext, R.raw.sound);
-
+		
+		// Upload Button
+        buttonUpload = (Button)findViewById(R.id.Button03);
+        buttonUpload.setOnClickListener(this);
+        
 		// get instance of Usb Manager
 		mUsbManager = UsbManager.getInstance(this);
 		mPermissionIntent = PendingIntent.getBroadcast(this, 0, new Intent(ACTION_USB_PERMISSION), 0);
