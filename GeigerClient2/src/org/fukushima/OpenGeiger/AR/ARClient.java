@@ -43,6 +43,8 @@ import android.os.ParcelFileDescriptor;
 import android.os.Vibrator;
 import android.util.Log;
 import android.view.KeyEvent;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
@@ -534,6 +536,46 @@ public class ARClient extends Activity implements Runnable,
 			}
 		}
 	};
+	
+	/**
+	 * Menu
+	 * @param menu
+	 * @return
+	 */
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		menu.add(Menu.NONE, 1, Menu.NONE, "ADK Client");
+		menu.add(Menu.NONE, 2, Menu.NONE, "Hand Client");
+		menu.add(Menu.NONE, 3, Menu.NONE, "Bluetooth Client");
+		return super.onCreateOptionsMenu(menu);
+	}
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		boolean ret = true;
+		switch (item.getItemId()) {
+			case 1:
+				Intent arIntent = new Intent();
+				arIntent.setClassName("org.fukushima.OpenGeiger", "org.fukushima.OpenGeiger.ADK.ADKClient");
+				startActivity(arIntent);
+				break;
+			
+			case 2:
+				Intent handIntent = new Intent();
+				handIntent.setClassName("org.fukushima.OpenGeiger", "org.fukushima.OpenGeiger.Hand.HandClient");
+				startActivity(handIntent);
+				break;
+			
+			case 3:
+				Intent bluetoothIntent = new Intent();
+				bluetoothIntent.setClassName("org.fukushima.OpenGeiger", "org.fukushima.OpenGeiger.Bluetooth.BluetoothClient");
+				startActivity(bluetoothIntent);
+				break;
+			default:
+				break;
+		}
+		return ret;
+	}
 
 }
 
@@ -770,7 +812,15 @@ class Preview extends SurfaceView implements SurfaceHolder.Callback {
 	public void surfaceCreated(SurfaceHolder holder) {
 		// The Surface has been created, acquire the camera and tell it where
 		// to draw.
-		mCamera = Camera.open();
+		
+		try{
+			mCamera = Camera.open();
+		}catch(Exception e){
+			
+			mCamera = null;
+			mCamera = Camera.open();
+		}
+		
 		try {
 			mCamera.setPreviewDisplay(holder);
 		} catch (IOException exception) {
@@ -788,6 +838,7 @@ class Preview extends SurfaceView implements SurfaceHolder.Callback {
 		// Because the CameraDevice object is not a shared resource, it's very
 		// important to release it when the activity is paused.
 		mCamera.stopPreview();
+		mCamera.release();
 		mCamera = null;
 	}
 

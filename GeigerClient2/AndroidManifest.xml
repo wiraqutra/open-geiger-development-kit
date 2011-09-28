@@ -43,7 +43,7 @@
         		  android:icon="@drawable/geiger"
                   android:label="@string/app_name_ar"
                   android:taskAffinity="" 
-                  android:launchMode="singleInstance"
+                  android:launchMode="singleTask"
                   android:screenOrientation="landscape"
                    android:theme="@android:style/Theme.NoTitleBar.Fullscreen"
                   >

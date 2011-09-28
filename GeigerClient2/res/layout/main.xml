@@ -75,7 +75,7 @@
     	android:gravity="center"
     	android:layout_marginTop="10px"
     	>
-	    <Button android:text="ON" 
+	    <Button android:text="BT ON" 
 	        android:id="@+id/Button02" 
 	        android:layout_width="100px" 
 	        android:layout_height="100px"
