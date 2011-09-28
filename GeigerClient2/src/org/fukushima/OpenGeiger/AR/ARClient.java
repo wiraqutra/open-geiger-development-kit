@@ -69,26 +69,26 @@ public class ARClient extends Activity implements Runnable,
 	 * Application
 	 */
 	private Application mApplication;
-	
+
 	/**
 	 * USB Accessory
 	 */
 	private UsbAccessory mAccessory;
-	
+
 	private ParcelFileDescriptor mFileDescriptor;
 	private FileInputStream mInputStream;
 	private FileOutputStream mOutputStream;
-	
+
 	/**
 	 * CameraView for AR
 	 */
 	private Preview mPreview;
-	
+
 	/**
 	 * Overlay用のView
 	 */
 	private MyView mView;
-	
+
 	/**
 	 * Registered Sensor
 	 */
@@ -96,38 +96,45 @@ public class ARClient extends Activity implements Runnable,
 	/**
 	 * Sensor Manager
 	 */
-	
+
 	private SensorManager mSensorManager = null;
 	private LocationManager lm;
-	
+
 	/**
 	 * Usb Manager
 	 */
 	private UsbManager mUsbManager;
 	
-	private final static int CALC = 1;
+	/**
+	 * Calculating and Display Radio Activity
+	 */
+	private final static int CALC_RADIOACTIVITY = 101;
+	
+	/**
+	 * Calculating and Display Distance from land
+	 */
+	private final static int CALC_DISTANCE = 102;
+	
 	private final static int ICON_BT = 2;
 	private final static int ICON_VISIBLE_GG = 3;
 	private final static int ICON_INVISIBLE_GG = 4;
-	private final static int CALCING = 5;
-	private final static int DEVICE = 10;
-	
+
 	/**
 	 * PendingIntent
 	 */
 	private PendingIntent mPermissionIntent;
 	private boolean mPermissionRequestPending;
-	
+
 	/**
 	 * Media Player
 	 */
 	private MediaPlayer mMp;
-	
+
 	/**
 	 * Vibrator
 	 */
 	private Vibrator vibrator;
-	
+
 	/**
 	 * Image
 	 */
@@ -145,8 +152,8 @@ public class ARClient extends Activity implements Runnable,
 	/**
 	 * 画像を格納する変数
 	 */
-	 private Bitmap mTitle; 
-	
+	private Bitmap mTitle;
+
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -198,8 +205,7 @@ public class ARClient extends Activity implements Runnable,
 			mAccessory = (UsbAccessory) getLastNonConfigurationInstance();
 			openAccessory(mAccessory);
 		} else {
-			Toast.makeText(this, "Not connect Geiger Counter",
-					Toast.LENGTH_LONG).show();
+			/*Toast.makeText(this, "Not connect Geiger Counter",Toast.LENGTH_LONG).show();*/
 		}
 		enableControls(true);
 
@@ -263,7 +269,7 @@ public class ARClient extends Activity implements Runnable,
 
 	@Override
 	protected void onPause() {
-		
+
 		if (mRegisteredSensor) {
 			mSensorManager.unregisterListener(this);
 			mRegisteredSensor = false;
@@ -271,10 +277,10 @@ public class ARClient extends Activity implements Runnable,
 		if (lm != null) {
 			lm.removeUpdates(this);
 		}
-		
+
 		// Close usb Accessory
 		closeAccessory();
-		
+
 		super.onPause();
 	}
 
@@ -304,7 +310,7 @@ public class ARClient extends Activity implements Runnable,
 		genpatsuLocation.setLatitude(37.428524);
 		genpatsuLocation.setLongitude(141.032867);
 		float distance = location.distanceTo(genpatsuLocation);
-		mView.setDistance(distance);
+		mView.setGenpatsu(distance);
 		// float direction = location.bearingTo(genpatsuLocation);
 		// mView.setDirection(""+direction);
 
@@ -405,35 +411,35 @@ public class ARClient extends Activity implements Runnable,
 				switch (buffer[i]) {
 				case 0x1:
 					if (len >= 3) {
-
+						Log.i(TAG,"value0x1:" + composeInt(buffer[i + 1], buffer[i + 2]));
+						Log.i(TAG, "bf1:" + buffer[i + 1]);
+						Log.i(TAG, "bf2:" + buffer[i + 2]);
 					}
 					i += 3;
 					break;
 
 				case 0x4:
 					if (len >= 3) {
-
+						Log.i(TAG,"value0x4:" + composeInt(buffer[i + 1], buffer[i + 2]));
+						Log.i(TAG, "bf1:" + buffer[i + 1]);
+						Log.i(TAG, "bf2:" + buffer[i + 2]);
 					}
 					i += 3;
 					break;
-
+				// Value of Geiger Counter
 				case 0x5:
 					if (len >= 3) {
-
-						Message m = Message.obtain(mHandler, CALC);
+						Log.i(TAG,"value0x5:" + composeInt(buffer[i + 1], buffer[i + 2]));
+						Log.i(TAG, "bf1:" + buffer[i + 1]);
+						Log.i(TAG, "bf2:" + buffer[i + 2]);
+						
+						Message m = Message.obtain(mHandler, CALC_RADIOACTIVITY);
 						int value = composeInt(buffer[i + 1], buffer[i + 2]);
 						if (value > 0) {
 							mMp.start();
 							counter += value;
 							m.arg1 = counter;
 							mHandler.sendMessageDelayed(m, 60 * 1000);
-
-							Log.i(TAG,
-									"value:"
-											+ composeInt(buffer[i + 1],
-													buffer[i + 2]));
-							Log.i(TAG, "bf1:" + buffer[i + 1]);
-							Log.i(TAG, "bf2:" + buffer[i + 2]);
 						}
 
 					}
@@ -442,7 +448,20 @@ public class ARClient extends Activity implements Runnable,
 
 				case 0x6:
 					if (len >= 3) {
-
+						Log.i(TAG,"value0x6:" + composeInt(buffer[i + 1], buffer[i + 2]));
+						Log.i(TAG, "bf1:" + buffer[i + 1]);
+						Log.i(TAG, "bf2:" + buffer[i + 2]);
+						
+						Message m = Message.obtain(mHandler, CALC_DISTANCE);
+						int value = composeInt(buffer[i + 1], buffer[i + 2]);
+						if (value > 0) {
+							value =  - (value - 600) / 10;
+							if(value < 0){
+								value = 0;
+							}
+							m.arg1 = value;
+							mHandler.sendMessage(m);
+						}
 					}
 					i += 3;
 					break;
@@ -501,10 +520,15 @@ public class ARClient extends Activity implements Runnable,
 			 * icon_geiger.setVisibility(ImageView.INVISIBLE); break; case
 			 * CALCING: mTextView.setText("Calc"); break;
 			 */
-			case CALC:
+			case CALC_RADIOACTIVITY:
 				int cpm = counter - msg.arg1;
 				double sv = cpm * 0.00883 * 0.5;
 				mView.setCount(sv);
+
+				break;
+			case CALC_DISTANCE:
+				float distance = msg.arg1;
+				mView.setDistance(distance);
 
 				break;
 			}
@@ -535,15 +559,20 @@ class MyView extends View {
 	private double count;
 
 	/**
-	 * 福島原発からの距離
+	 * 地表からの距離
 	 */
 	private float distance;
+	
+	/**
+	 * 福島原発からの距離
+	 */
+	private float fukushima;
 
 	/**
 	 * Title
 	 */
 	private Bitmap mTitle;
-	
+
 	/**
 	 * コンストラクタ
 	 * 
@@ -552,7 +581,7 @@ class MyView extends View {
 	public MyView(Context c) {
 		super(c);
 		setFocusable(true);
-		
+
 		Resources res = c.getResources();
 		mTitle = BitmapFactory.decodeResource(res, R.drawable.title);
 	}
@@ -566,31 +595,26 @@ class MyView extends View {
 		// 背景色を設定
 		// A,R,G,Bで指定
 		int alpha = 0;
-		if(count < 0.1){
+		if (count < 0.1) {
 			alpha = 0;
-		}
-		else if(count < 0.2){
+		} else if (count < 0.2) {
 			alpha = 50;
-		}
-		else if(count < 0.3){
+		} else if (count < 0.3) {
 			alpha = 100;
-		}
-		else if(count < 0.4){
+		} else if (count < 0.4) {
 			alpha = 150;
-		}
-		else if(count < 0.5){
+		} else if (count < 0.5) {
 			alpha = 200;
-		}
-		else if(count < 0.6){
+		} else if (count < 0.6) {
 			alpha = 250;
 		}
-		
-		canvas.drawColor(Color.argb(alpha, 255,0,0));
-		
+
+		canvas.drawColor(Color.argb(alpha, 255, 0, 0));
+
 		Paint imagePaint = new Paint();
-		
+
 		canvas.drawBitmap(mTitle, 0, 0, imagePaint);
-		
+
 		// 文字の色を設定
 		Paint textOrientPaint = new Paint();
 		textOrientPaint.setStyle(Paint.Style.FILL);
@@ -607,11 +631,18 @@ class MyView extends View {
 		textRadioPaint.setStyle(Paint.Style.FILL);
 		textRadioPaint.setTextSize(50);
 		textRadioPaint.setARGB(255, 255, 0, 0);
-		String formatCount = String.format("%.4f",count) + "sv/h";
-		if(count == 0){
+		String formatCount = String.format("%.4f", count) + "sv/h";
+		if (count == 0) {
 			formatCount = "Calculating...";
 		}
 		canvas.drawText(formatCount, 500, 60, textRadioPaint);
+		
+		// 文字の色を設定
+		Paint textDistancePaint = new Paint();
+		textDistancePaint.setStyle(Paint.Style.FILL);
+		textDistancePaint.setTextSize(30);
+		textDistancePaint.setARGB(255, 255, 0, 0);
+		canvas.drawText(distance + "cm", 500, 100, textDistancePaint);
 
 		// 文字の色を設定
 		Paint textGpsPaint = new Paint();
@@ -623,13 +654,13 @@ class MyView extends View {
 		canvas.drawText("lon :" + lonString, 20, 410, textGpsPaint);
 
 		// 文字の色を設定
-		Paint textDistancePaint = new Paint();
-		textDistancePaint.setStyle(Paint.Style.FILL);
-		textDistancePaint.setTextSize(30);
-		textDistancePaint.setARGB(255, 255, 0, 0);
+		Paint textGenpatsuPaint = new Paint();
+		textGenpatsuPaint.setStyle(Paint.Style.FILL);
+		textGenpatsuPaint.setTextSize(30);
+		textGenpatsuPaint.setARGB(255, 255, 0, 0);
 
-		canvas.drawText("From fukushima : " + distance + "m", 20, 440,
-				textDistancePaint);
+		canvas.drawText("From fukushima : " + fukushima + "m", 20, 440,
+				textGenpatsuPaint);
 
 	}
 
@@ -694,10 +725,19 @@ class MyView extends View {
 	}
 
 	/**
-	 * 距離の設定
+	 * 地表距離の設定
 	 */
 	public void setDistance(float distance) {
 		this.distance = distance;
+		/* 再描画の指示 */
+		invalidate();
+	}
+	
+	/**
+	 * 福島からの距離の設定
+	 */
+	public void setGenpatsu(float fukushima) {
+		this.fukushima = fukushima;
 		/* 再描画の指示 */
 		invalidate();
 	}
