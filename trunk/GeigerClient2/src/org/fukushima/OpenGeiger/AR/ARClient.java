@@ -29,6 +29,7 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -47,8 +48,10 @@ import android.view.View;
 import android.view.Window;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.ImageView;
+import android.widget.Toast;
 
-public class ARClient extends Activity implements Runnable, SensorEventListener, LocationListener {
+public class ARClient extends Activity implements Runnable,
+		SensorEventListener, LocationListener {
 
 	/**
 	 * Tag
@@ -65,10 +68,10 @@ public class ARClient extends Activity implements Runnable, SensorEventListener,
 	 */
 	private Application mApplication;
 
-	UsbAccessory mAccessory;
-	ParcelFileDescriptor mFileDescriptor;
-	FileInputStream mInputStream;
-	FileOutputStream mOutputStream;
+	private UsbAccessory mAccessory;
+	private ParcelFileDescriptor mFileDescriptor;
+	private FileInputStream mInputStream;
+	private FileOutputStream mOutputStream;
 	private Preview mPreview;
 	private MyView mView;
 	private boolean mRegisteredSensor;
@@ -78,26 +81,26 @@ public class ARClient extends Activity implements Runnable, SensorEventListener,
 	 * Usb Manager
 	 */
 	private UsbManager mUsbManager;
-	final static int CALC = 1;
-	final static int ICON_BT = 2;
-	final static int ICON_VISIBLE_GG = 3;
-	final static int ICON_INVISIBLE_GG = 4;
-	final static int CALCING = 5;
-	final static int DEVICE = 10;
+	private final static int CALC = 1;
+	private final static int ICON_BT = 2;
+	private final static int ICON_VISIBLE_GG = 3;
+	private final static int ICON_INVISIBLE_GG = 4;
+	private final static int CALCING = 5;
+	private final static int DEVICE = 10;
 	/**
 	 * PendingIntent
 	 */
 	private PendingIntent mPermissionIntent;
 	private boolean mPermissionRequestPending;
 	private MediaPlayer mMp;
-	Vibrator vibrator;
-	Drawable image;
+	private Vibrator vibrator;
+	private Drawable image;
 
 	/**
 	 * Total Count
 	 */
 	private int counter;
-	
+
 	/**
 	 * Action Name of connecting USB
 	 */
@@ -114,10 +117,17 @@ public class ARClient extends Activity implements Runnable, SensorEventListener,
 
 		// LocationManagerでGPSの値を取得するための設定
 		lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-		// 値が変化した際に呼び出されるリスナーの追加
-		lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this);
 
-		vibrator = (Vibrator) mContext.getSystemService(Context.VIBRATOR_SERVICE);
+		// 過去のgPS
+		/*
+		 * Criteria crit = new Criteria();
+		 * crit.setAccuracy(Criteria.ACCURACY_FINE); String provider =
+		 * lm.getBestProvider(crit, true); Location loc =
+		 * lm.getLastKnownLocation(provider);
+		 */
+
+		vibrator = (Vibrator) mContext
+				.getSystemService(Context.VIBRATOR_SERVICE);
 		Resources res = this.getBaseContext().getResources();
 
 		// サウンドデータの読み込み(res/raw/sound.wav)
@@ -130,56 +140,59 @@ public class ARClient extends Activity implements Runnable, SensorEventListener,
 		setContentView(mPreview);
 
 		mView = new MyView(this);
-		addContentView(mView, new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
-		
+		addContentView(mView, new LayoutParams(LayoutParams.WRAP_CONTENT,
+				LayoutParams.WRAP_CONTENT));
+
 		// get instance of Usb Manager
 		mUsbManager = UsbManager.getInstance(this);
-		mPermissionIntent = PendingIntent.getBroadcast(this, 0, new Intent(ACTION_USB_PERMISSION), 0);
+		mPermissionIntent = PendingIntent.getBroadcast(this, 0, new Intent(
+				ACTION_USB_PERMISSION), 0);
 		IntentFilter filter = new IntentFilter(ACTION_USB_PERMISSION);
 		filter.addAction(UsbManager.ACTION_USB_ACCESSORY_DETACHED);
 		registerReceiver(mUsbReceiver, filter);
 
-		Log.i(TAG, "getLastNonConfigurationInstance()" + getLastNonConfigurationInstance());
+		Log.i(TAG, "getLastNonConfigurationInstance()"
+				+ getLastNonConfigurationInstance());
 		if (getLastNonConfigurationInstance() != null) {
 			mAccessory = (UsbAccessory) getLastNonConfigurationInstance();
 			openAccessory(mAccessory);
+		} else {
+			Toast.makeText(this, "Not connect Geiger Counter",
+					Toast.LENGTH_LONG).show();
 		}
 		enableControls(true);
-		
-		
 
 	}
-	
-	
 
 	public void onAccuracyChanged(Sensor sensor, int accuracy) {
 		// TODO Auto-generated method stub
 
 	}
-	
-	/** 
+
+	/**
 	 * Call when change sensor value
 	 */
 	public void onSensorChanged(SensorEvent event) {
 		// TODO Auto-generated method stub
 		if (event.sensor.getType() == Sensor.TYPE_ORIENTATION) {
-			mView.setOrientationString((int) event.values[0], (int) event.values[1], (int) event.values[2]);
+			mView.setOrientationString((int) event.values[0],
+					(int) event.values[1], (int) event.values[2]);
 		}
 	}
 
 	@Override
 	protected void onResume() {
-		
+
 		super.onResume();
-		
+
 		List sensors = mSensorManager.getSensorList(Sensor.TYPE_ORIENTATION);
 
 		if (sensors.size() > 0) {
 			Sensor sensor = (Sensor) sensors.get(0);
-			mRegisteredSensor = mSensorManager.registerListener(this, sensor, SensorManager.SENSOR_DELAY_FASTEST);
+			mRegisteredSensor = mSensorManager.registerListener(this, sensor,
+					SensorManager.SENSOR_DELAY_FASTEST);
 		}
-		
-		
+
 		Intent intent = getIntent();
 		if (mInputStream != null && mOutputStream != null) {
 			return;
@@ -193,7 +206,8 @@ public class ARClient extends Activity implements Runnable, SensorEventListener,
 			} else {
 				synchronized (mUsbReceiver) {
 					if (!mPermissionRequestPending) {
-						mUsbManager.requestPermission(accessory, mPermissionIntent);
+						mUsbManager.requestPermission(accessory,
+								mPermissionIntent);
 						mPermissionRequestPending = true;
 					}
 				}
@@ -201,8 +215,10 @@ public class ARClient extends Activity implements Runnable, SensorEventListener,
 		} else {
 			Log.d(TAG, "mAccessory is null");
 		}
+
+		// 値が変化した際に呼び出されるリスナーの追加
+		lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this);
 	}
-	
 
 	@Override
 	protected void onPause() {
@@ -210,10 +226,14 @@ public class ARClient extends Activity implements Runnable, SensorEventListener,
 			mSensorManager.unregisterListener(this);
 			mRegisteredSensor = false;
 		}
+		if (lm != null) {
+			lm.removeUpdates(this);
+		}
+
 		super.onPause();
 		closeAccessory();
 	}
-	
+
 	@Override
 	public void onDestroy() {
 		unregisterReceiver(mUsbReceiver);
@@ -229,16 +249,19 @@ public class ARClient extends Activity implements Runnable, SensorEventListener,
 
 	// GPSの値が更新されると呼び出される
 	public void onLocationChanged(Location location) {
-		mView.setLocaionString("" + location.getLatitude(), "" + location.getLongitude());
-		
-		 // 原発座標
+		Log.i(TAG, "onLocationChanged");
+
+		mView.setLocaionString("" + location.getLatitude(),
+				"" + location.getLongitude());
+
+		// 原発座標
 		Location genpatsuLocation = new Location("genpatsu");
 		genpatsuLocation.setLatitude(37.428524);
 		genpatsuLocation.setLongitude(141.032867);
 		float distance = location.distanceTo(genpatsuLocation);
 		mView.setDistance(distance);
-		//float direction = location.bearingTo(genpatsuLocation);
-		//mView.setDirection(""+direction);  
+		// float direction = location.bearingTo(genpatsuLocation);
+		// mView.setDirection(""+direction);
 
 	}
 
@@ -265,10 +288,12 @@ public class ARClient extends Activity implements Runnable, SensorEventListener,
 			if (ACTION_USB_PERMISSION.equals(action)) {
 				synchronized (this) {
 					UsbAccessory accessory = UsbManager.getAccessory(intent);
-					if (intent.getBooleanExtra(UsbManager.EXTRA_PERMISSION_GRANTED, false)) {
+					if (intent.getBooleanExtra(
+							UsbManager.EXTRA_PERMISSION_GRANTED, false)) {
 						openAccessory(accessory);
 					} else {
-						Log.d(TAG, "permission denied for accessory " + accessory);
+						Log.d(TAG, "permission denied for accessory "
+								+ accessory);
 					}
 					mPermissionRequestPending = false;
 				}
@@ -320,7 +345,7 @@ public class ARClient extends Activity implements Runnable, SensorEventListener,
 		int ret = 0;
 		byte[] buffer = new byte[16384];
 		int i;
-		//icon_geiger.setVisibility(ImageView.VISIBLE);
+		// icon_geiger.setVisibility(ImageView.VISIBLE);
 		while (ret >= 0) {
 			try {
 				ret = mInputStream.read(buffer);
@@ -358,7 +383,10 @@ public class ARClient extends Activity implements Runnable, SensorEventListener,
 							m.arg1 = counter;
 							mHandler.sendMessageDelayed(m, 60 * 1000);
 
-							Log.i(TAG, "value:" + composeInt(buffer[i + 1], buffer[i + 2]));
+							Log.i(TAG,
+									"value:"
+											+ composeInt(buffer[i + 1],
+													buffer[i + 2]));
 							Log.i(TAG, "bf1:" + buffer[i + 1]);
 							Log.i(TAG, "bf2:" + buffer[i + 2]);
 						}
@@ -421,19 +449,13 @@ public class ARClient extends Activity implements Runnable, SensorEventListener,
 		public void handleMessage(Message msg) {
 			switch (msg.what) {
 			/*
-			case ICON_ADK:
-				icon_adk.setVisibility(ImageView.VISIBLE);
-				break;
-			case ICON_VISIBLE_GG:
-				icon_geiger.setVisibility(ImageView.VISIBLE);
-				break;
-			case ICON_INVISIBLE_GG:
-				icon_geiger.setVisibility(ImageView.INVISIBLE);
-				break;
-			case CALCING:
-				mTextView.setText("Calc");
-				break;
-				*/
+			 * case ICON_ADK: icon_adk.setVisibility(ImageView.VISIBLE); break;
+			 * case ICON_VISIBLE_GG:
+			 * icon_geiger.setVisibility(ImageView.VISIBLE); break; case
+			 * ICON_INVISIBLE_GG:
+			 * icon_geiger.setVisibility(ImageView.INVISIBLE); break; case
+			 * CALCING: mTextView.setText("Calc"); break;
+			 */
 			case CALC:
 				int cpm = counter - msg.arg1;
 				double sv = cpm * 0.00883 * 0.5;
@@ -464,17 +486,17 @@ class MyView extends View {
 
 	String latString;
 	String lonString;
-	
+
 	/**
 	 * 放射能値
 	 */
 	private double count;
-	
+
 	/**
 	 * 福島原発からの距離
 	 */
 	private float distance;
-	
+
 	/**
 	 * コンストラクタ
 	 * 
@@ -491,31 +513,45 @@ class MyView extends View {
 	protected void onDraw(Canvas canvas) {
 		super.onDraw(canvas);
 
-		/* 背景色を設定 */
+		// 背景色を設定
 		canvas.drawColor(Color.TRANSPARENT);
 
-		/* 描画するための線の色を設定 */
-		Paint mainPaint = new Paint();
-		mainPaint.setStyle(Paint.Style.FILL);
-		mainPaint.setARGB(255, 255, 255, 100);
+		// 文字の色を設定
+		Paint textOrientPaint = new Paint();
+		textOrientPaint.setStyle(Paint.Style.FILL);
+		textOrientPaint.setTextSize(20);
+		textOrientPaint.setARGB(255, 0, 255, 0);
 
-		/* 線で描画 */
-		canvas.drawLine(x, y, 50, 50, mainPaint);
+		// 文字を描画
+		canvas.drawText("roll  :" + ori_x, 600, 370, textOrientPaint);
+		canvas.drawText("yaw   :" + ori_y, 600, 390, textOrientPaint);
+		canvas.drawText("pitch :" + ori_z, 600, 410, textOrientPaint);
 
-		/* 文字の色を設定 */
-		Paint textPaint = new Paint();
-		textPaint.setStyle(Paint.Style.FILL);
-		textPaint.setTextSize(25);
-		textPaint.setARGB(255, 255, 0, 0);
+		// 文字の色を設定
+		Paint textRadioPaint = new Paint();
+		textRadioPaint.setStyle(Paint.Style.FILL);
+		textRadioPaint.setTextSize(50);
+		textRadioPaint.setARGB(255, 255, 0, 0);
 
-		/* 文字を描画 */
-		canvas.drawText("x" + ori_x, 20, 30, textPaint);
-		canvas.drawText("y" + ori_y, 20, 50, textPaint);
-		canvas.drawText("z" + ori_z, 20, 70, textPaint);
-		canvas.drawText("lat" + latString, 20, 120, textPaint);
-		canvas.drawText("lon" + lonString, 20, 140, textPaint);
-		canvas.drawText("count" + count, 20, 200, textPaint);
-		canvas.drawText("distance" + distance, 20, 220, textPaint);
+		canvas.drawText(count + "sv/h", 500, 60, textRadioPaint);
+
+		// 文字の色を設定
+		Paint textGpsPaint = new Paint();
+		textGpsPaint.setStyle(Paint.Style.FILL);
+		textGpsPaint.setTextSize(20);
+		textGpsPaint.setARGB(255, 255, 255, 255);
+
+		canvas.drawText("lat :" + latString, 20, 370, textGpsPaint);
+		canvas.drawText("lon :" + lonString, 20, 390, textGpsPaint);
+
+		// 文字の色を設定
+		Paint textDistancePaint = new Paint();
+		textDistancePaint.setStyle(Paint.Style.FILL);
+		textDistancePaint.setTextSize(30);
+		textDistancePaint.setARGB(255, 255, 0, 0);
+
+		canvas.drawText("From fukushima : " + distance + "m", 20, 420,
+				textDistancePaint);
 
 		/* 文字の色を設定 */
 		Paint dirTextPaint = new Paint();
@@ -577,26 +613,25 @@ class MyView extends View {
 		/* 再描画の指示 */
 		invalidate();
 	}
-	
+
 	/**
 	 * 値の設定
 	 */
-	public void setCount(double count){
+	public void setCount(double count) {
 		this.count = count;
 		/* 再描画の指示 */
 		invalidate();
 	}
-	
+
 	/**
 	 * 距離の設定
 	 */
-	public void setDistance(float distance){
+	public void setDistance(float distance) {
 		this.distance = distance;
 		/* 再描画の指示 */
 		invalidate();
 	}
-	
-	
+
 }
 
 /**

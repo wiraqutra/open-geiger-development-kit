@@ -261,7 +261,6 @@ public class ADKClient extends MapActivity implements Runnable, OnClickListener,
 		// iconを非表示にする
 		icon_adk.setVisibility(ImageView.VISIBLE);
 		icon_geiger.setVisibility(ImageView.INVISIBLE);
-
 		
 	}
 
@@ -617,8 +616,6 @@ public class ADKClient extends MapActivity implements Runnable, OnClickListener,
 					break;
 				}
 			}
-
 		}
 	}
-
 }
