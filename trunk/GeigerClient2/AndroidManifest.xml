@@ -60,7 +60,7 @@
 		</activity>
         
         
-         <activity android:name="org.fukushima.OpenGeiger.HandClient.HandClient"
+         <activity android:name="org.fukushima.OpenGeiger.Hand.HandClient"
                   android:label="@string/app_hand_name"
                   android:icon="@drawable/geiger"
                   android:screenOrientation="portrait" 
