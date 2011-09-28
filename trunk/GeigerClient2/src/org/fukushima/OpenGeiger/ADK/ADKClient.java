@@ -173,17 +173,16 @@ public class ADKClient extends MapActivity implements Runnable, OnClickListener,
 	Uri mImageUri;
 
 	String mCPM = "";
-	
+
 	/**
 	 * UsbAccessory
 	 */
 	private UsbAccessory mAccessory;
-	
-	
+
 	private ParcelFileDescriptor mFileDescriptor;
 	private FileInputStream mInputStream;
 	private FileOutputStream mOutputStream;
-	
+
 	/**
 	 * Total Count
 	 */
@@ -213,11 +212,11 @@ public class ADKClient extends MapActivity implements Runnable, OnClickListener,
 
 		// load the data of sound
 		mMp = MediaPlayer.create(mContext, R.raw.sound);
-		
+
 		// Upload Button
-        buttonUpload = (Button)findViewById(R.id.Button03);
-        buttonUpload.setOnClickListener(this);
-        
+		buttonUpload = (Button) findViewById(R.id.Button03);
+		buttonUpload.setOnClickListener(this);
+
 		// get instance of Usb Manager
 		mUsbManager = UsbManager.getInstance(this);
 		mPermissionIntent = PendingIntent.getBroadcast(this, 0, new Intent(ACTION_USB_PERMISSION), 0);
@@ -265,7 +264,7 @@ public class ADKClient extends MapActivity implements Runnable, OnClickListener,
 		// iconを非表示にする
 		icon_adk.setVisibility(ImageView.VISIBLE);
 		icon_geiger.setVisibility(ImageView.INVISIBLE);
-		
+
 	}
 
 	@Override
@@ -370,9 +369,10 @@ public class ADKClient extends MapActivity implements Runnable, OnClickListener,
 
 		return date;
 	}
-	
+
 	/**
 	 * Call when GPS loaded.
+	 * 
 	 * @param lat
 	 * @param lon
 	 */
@@ -391,9 +391,10 @@ public class ADKClient extends MapActivity implements Runnable, OnClickListener,
 
 		locationAPI.removeGps();
 	}
-	
+
 	/**
 	 * Menu
+	 * 
 	 * @param menu
 	 * @return
 	 */
@@ -409,25 +410,25 @@ public class ADKClient extends MapActivity implements Runnable, OnClickListener,
 	public boolean onOptionsItemSelected(MenuItem item) {
 		boolean ret = true;
 		switch (item.getItemId()) {
-			case 1:
-				Intent arIntent = new Intent();
-				arIntent.setClassName("org.fukushima.OpenGeiger", "org.fukushima.OpenGeiger.AR.ARClient");
-				startActivity(arIntent);
-				break;
-			
-			case 2:
-				Intent handIntent = new Intent();
-				handIntent.setClassName("org.fukushima.OpenGeiger", "org.fukushima.OpenGeiger.Hand.HandClient");
-				startActivity(handIntent);
-				break;
-			
-			case 3:
-				Intent bluetoothIntent = new Intent();
-				bluetoothIntent.setClassName("org.fukushima.OpenGeiger", "org.fukushima.OpenGeiger.Bluetooth.BluetoothClient");
-				startActivity(bluetoothIntent);
-				break;
-			default:
-				break;
+		case 1:
+			Intent arIntent = new Intent();
+			arIntent.setClassName("org.fukushima.OpenGeiger", "org.fukushima.OpenGeiger.AR.ARClient");
+			startActivity(arIntent);
+			break;
+
+		case 2:
+			Intent handIntent = new Intent();
+			handIntent.setClassName("org.fukushima.OpenGeiger", "org.fukushima.OpenGeiger.Hand.HandClient");
+			startActivity(handIntent);
+			break;
+
+		case 3:
+			Intent bluetoothIntent = new Intent();
+			bluetoothIntent.setClassName("org.fukushima.OpenGeiger", "org.fukushima.OpenGeiger.Bluetooth.BluetoothClient");
+			startActivity(bluetoothIntent);
+			break;
+		default:
+			break;
 		}
 		return ret;
 	}
